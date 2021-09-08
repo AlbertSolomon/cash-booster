@@ -28,6 +28,7 @@ public class Activity3 extends AppCompatActivity {
            @Override
            public void onClick(View view) {
                openUserDashboard();
+               finish();
            }
        });
     }

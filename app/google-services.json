@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "479302638486",
+    "project_id": "cashbooster-63984",
+    "storage_bucket": "cashbooster-63984.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:479302638486:android:a6deb3e2c1e98405345bb7",
+        "android_client_info": {
+          "package_name": "com.example.cashbooster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "479302638486-p8d93r4krcfpbk8ieiv7m11t7cibl81v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOsdhB9VTIw2gEw3MB_WTUWehn1B4E7kI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "479302638486-p8d93r4krcfpbk8ieiv7m11t7cibl81v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

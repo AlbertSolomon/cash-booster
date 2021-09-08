@@ -28,9 +28,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 openNextActivity();
+                finish();
             }
         });
-        signingUp();
+
+        signupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signingUp();
+            }
+        });
     }
 
     public void openNextActivity(){
