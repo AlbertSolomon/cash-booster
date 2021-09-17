@@ -69,6 +69,7 @@ public class Activity4 extends AppCompatActivity {
                     for (QueryDocumentSnapshot document: task.getResult()){
 
                          //displayData.setText(String.valueOf(document.getData()));
+                        document.getId();
 
                     }
 
