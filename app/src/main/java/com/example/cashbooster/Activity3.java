@@ -27,11 +27,11 @@ public class Activity3 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_3);
 
-        Activity3button = (Button)findViewById(R.id.Activity3button);
-        userName3 = (EditText)findViewById(R.id.userName3);
-        editTextPhone = (EditText)findViewById(R.id.editTextPhone);
-        passwordActivity3 = (EditText)findViewById(R.id.passwordActivity3);
-        passwordActivity3Confirm = (EditText)findViewById(R.id.passwordActivity3Confirm);
+        Activity3button = findViewById(R.id.Activity3button);
+        userName3 = findViewById(R.id.userName3);
+        editTextPhone = findViewById(R.id.editTextPhone);
+        passwordActivity3 = findViewById(R.id.passwordActivity3);
+        passwordActivity3Confirm = findViewById(R.id.passwordActivity3Confirm);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
 
@@ -46,8 +46,6 @@ public class Activity3 extends AppCompatActivity {
                 //openUserDashboard();
                 if (username.isEmpty()){
                     Toast.makeText(getApplicationContext(),"Please enter your user name", Toast.LENGTH_SHORT).show();
-                }else if (phoneNumber.isEmpty()){
-                    Toast.makeText(getApplicationContext(),"Please enter in your Phone Number", Toast.LENGTH_SHORT).show();
                 }else if (password.isEmpty()){
                     Toast.makeText(getApplicationContext(),"Please enter your Password", Toast.LENGTH_SHORT).show();
                 }
