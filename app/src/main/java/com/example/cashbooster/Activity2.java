@@ -20,7 +20,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -38,9 +37,9 @@ public class Activity2 extends AppCompatActivity {
     FirebaseAnalytics TestFirebaseAnalytics;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    String collectionName;
+    //String collectionName;
 
-    CollectionReference GamePortals;
+    //CollectionReference GamePortals;
     Random randomNumber = new Random();
     int gameRange;
     int luckyNumber;
@@ -49,8 +48,8 @@ public class Activity2 extends AppCompatActivity {
     String GameState;
     String GameStart;
     {
-        collectionName = "GamePortals"+nameConcatenation;
-        GamePortals = db.collection(collectionName);
+        //collectionName = "GamePortals"+nameConcatenation;
+        //GamePortals = db.collection(collectionName);
         nameConcatenation = randomNumber.nextInt(100000 - 10000) + 1;
         luckyNumber = randomNumber.nextInt(9999-100) + 1;
         gameRange = 2000;

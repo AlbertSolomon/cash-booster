@@ -40,6 +40,8 @@
         android:layout_height="232dp"
         android:gravity="center"
         android:text=""
+        android:hint="count no. of documents "
+        android:textColor="#F44336"
         android:textAlignment="center"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"

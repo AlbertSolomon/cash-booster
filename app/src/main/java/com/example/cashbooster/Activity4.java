@@ -3,11 +3,12 @@ package com.example.cashbooster;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+//import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,11 +21,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-public class Activity4 extends AppCompatActivity {
-    RecyclerView displayData;
-    Button playGame;
+import java.util.ArrayList;
 
-    FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+public class Activity4 extends AppCompatActivity {
+    //RecyclerView displayData;
+    TextView displayData;
+    Button playGame;
+    //String TAG;
+
+    ArrayList<String> numberPot;
+    int randomPicker = (int) (Math.random()*4);
+
     CollectionReference GamePortals;
     String collectionName;
 
@@ -39,17 +46,17 @@ public class Activity4 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_4);
+        numberPot = new ArrayList<>();
 
         displayData = findViewById(R.id.displayData);
         playGame = findViewById(R.id.playGame);
 
-
-
-        String currentUser;
+        //FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+        /*String currentUser;
         {
 
             currentUser = mFirebaseAuth.getCurrentUser().getUid();
-        }
+        }*/
 
         playGame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,18 +68,31 @@ public class Activity4 extends AppCompatActivity {
 
     public void SelectWinners(){
 
-        GamePortals.whereLessThan("GameCode",10000)
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()){
                     for (QueryDocumentSnapshot document: task.getResult()){
 
-                         //displayData.setText(String.valueOf(document.getData()));
-                        document.getId();
+                        displayData.setText(String.valueOf(document.get("GameCode")));
+                         numberPot.add((String) document.get("GameCode"));
+                         numberPot.get(randomPicker);
+                       // Log.d(TAG,"onCreate: numbers:" + numberPot.get(randomPicker));
 
+                        GamePortals.whereEqualTo("GameCode", numberPot.get(randomPicker))
+                                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()){
+                                    document.getReference().update("GameState","Winner");
+                                    Toast.makeText(getApplicationContext(),"Updating was successful!", Toast.LENGTH_SHORT).show();
+                                }else
+                                {
+                                    Toast.makeText(getApplicationContext(),"Updating was not successful!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
-
                 }else{
                     Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
                 }
