@@ -36,13 +36,13 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="237dp"
-        android:layout_height="232dp"
+        android:layout_width="267dp"
+        android:layout_height="133dp"
         android:gravity="center"
-        android:text=""
         android:hint="count no. of documents "
-        android:textColor="#F44336"
+        android:text=""
         android:textAlignment="center"
+        android:textColor="#F44336"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -59,25 +59,26 @@
         app:backgroundTint="#F44336"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.644"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.565" />
+        app:layout_constraintVertical_bias="0.473" />
 
     <TextView
-        android:id="@+id/textView5"
-        android:layout_width="146dp"
-        android:layout_height="43dp"
+        android:id="@+id/CashBalanceDisplay"
+        android:layout_width="102dp"
+        android:layout_height="83dp"
+        android:hint="Account details"
         android:gravity="center"
-        android:text="Select Amount"
         android:textAlignment="center"
+        android:textColor="#F44336"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.46"
+        app:layout_constraintHorizontal_bias="0.902"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.053" />
+        app:layout_constraintVertical_bias="0.04" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

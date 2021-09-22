@@ -20,6 +20,8 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -32,10 +34,11 @@ import java.util.Random;
 public class Activity2 extends AppCompatActivity {
 
     Button activity2Button, searchPortal, goToActivity4;
-    TextView textView2;
+    TextView textView2, CashBalanceDisplay;
 
     FirebaseAnalytics TestFirebaseAnalytics;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    CollectionReference Accounts;
 
     //String collectionName;
 
@@ -47,6 +50,7 @@ public class Activity2 extends AppCompatActivity {
     String permission;
     String GameState;
     String GameStart;
+    String AccountsCollectionName = "Accounts";
     {
         //collectionName = "GamePortals"+nameConcatenation;
         //GamePortals = db.collection(collectionName);
@@ -56,6 +60,8 @@ public class Activity2 extends AppCompatActivity {
         permission = "A";
         GameStart = "None";
         GameState = "None";
+        Accounts = db.collection(AccountsCollectionName);
+
     }
 
     @Override
@@ -66,12 +72,15 @@ public class Activity2 extends AppCompatActivity {
 
         activity2Button = findViewById(R.id.activity2Button);
         textView2 = findViewById(R.id.textView2);
+        CashBalanceDisplay = findViewById(R.id.CashBalanceDisplay);
         searchPortal = findViewById(R.id.searchPortal);
         goToActivity4 = findViewById(R.id.goToActivity4);
 
         TestFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         String currentUser = mFirebaseAuth.getCurrentUser().getUid();
+
+        getAccountBalance(currentUser);
 
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -161,4 +170,41 @@ public class Activity2 extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void AccountCollection(String UserID, int AccountBalance){
+        Map<String, Object>accountCollection = new HashMap<>();
+        accountCollection.put("UserID",UserID);
+        accountCollection.put("AmountBalance", AccountBalance);
+
+        Accounts.document(UserID).set(accountCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull @NotNull Exception e) {
+                Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getAccountBalance(String UserID){
+        Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        CashBalanceDisplay.setText(String.valueOf(document.get("AmountBalance")));
+                    }else {
+                        CashBalanceDisplay.setText("N/A");
+                        Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
+                    }
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 }
