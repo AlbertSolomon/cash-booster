@@ -76,8 +76,8 @@
 
     <Button
         android:id="@+id/signupButton"
-        android:layout_width="79dp"
-        android:layout_height="43dp"
+        android:layout_width="144dp"
+        android:layout_height="39dp"
         android:gravity="center"
         android:text="Sign up"
         android:textAlignment="center"
@@ -86,9 +86,9 @@
         app:backgroundTint="#F44336"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.734"
+        app:layout_constraintHorizontal_bias="0.94"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.761" />
+        app:layout_constraintVertical_bias="0.763" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,7 +24,7 @@
         android:id="@+id/goToActivity4"
         android:layout_width="170dp"
         android:layout_height="112dp"
-        android:text="Play"
+        android:text="Ready"
         android:textSize="25sp"
         app:backgroundTint="#F44336"
         app:layout_constraintBottom_toBottomOf="parent"
