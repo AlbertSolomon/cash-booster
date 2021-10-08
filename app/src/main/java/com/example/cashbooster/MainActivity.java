@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAuth.signInWithEmailAndPassword(username,password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                startActivity(new Intent(MainActivity.this, Activity2.class));
+                startActivity(new Intent(MainActivity.this, LandingActivity.class));
                 finish();
                 Toast.makeText(MainActivity.this, "Login successful!",Toast.LENGTH_SHORT).show();
             }

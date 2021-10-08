@@ -5,20 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff"
-    tools:context=".Activity2">
+    tools:context="Activity2">
+
+    <Button
+        android:id="@+id/getRecords"
+        android:layout_width="137dp"
+        android:layout_height="42dp"
+        android:text="check Records"
+        android:textSize="10dp"
+        app:backgroundTint="#F44336"
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.053"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.234" />
 
     <Button
         android:id="@+id/activity2Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Check"
+        android:layout_width="107dp"
+        android:layout_height="91dp"
+        android:text="2k"
+        android:textSize="25dp"
         app:backgroundTint="#F44336"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchPortal"
-        app:layout_constraintVertical_bias="0.134" />
+        app:layout_constraintVertical_bias="0.135" />
 
     <Button
         android:id="@+id/goToActivity4"
@@ -68,7 +82,7 @@
         android:id="@+id/CashBalanceDisplay"
         android:layout_width="102dp"
         android:layout_height="83dp"
-        android:hint="Account details"
+        android:hint="Account Balance"
         android:gravity="center"
         android:textAlignment="center"
         android:textColor="#F44336"

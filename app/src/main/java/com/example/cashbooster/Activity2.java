@@ -1,6 +1,9 @@
+
+
 package com.example.cashbooster;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,14 +19,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ import java.util.Random;
 
 public class Activity2 extends AppCompatActivity {
 
-    Button activity2Button, searchPortal, goToActivity4;
+    Button activity2Button, searchPortal, goToActivity4, getRecords;
     TextView textView2, CashBalanceDisplay;
 
     FirebaseAnalytics TestFirebaseAnalytics;
@@ -47,7 +48,6 @@ public class Activity2 extends AppCompatActivity {
     Random randomNumber = new Random();
     int gameRange;
     int luckyNumber;
-    //int nameConcatenation;
     String permission;
     String GameState;
     String GameStart;
@@ -55,7 +55,6 @@ public class Activity2 extends AppCompatActivity {
     {
         collectionName = "GamePortals";
         GamePortals = db.collection(collectionName);
-        //nameConcatenation = randomNumber.nextInt(100000 - 10000) + 1;
         luckyNumber = randomNumber.nextInt(9999-100) + 1;
         gameRange = 2000;
         permission = "A";
@@ -72,6 +71,7 @@ public class Activity2 extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
 
         activity2Button = findViewById(R.id.activity2Button);
+        getRecords = findViewById(R.id.getRecords);
         textView2 = findViewById(R.id.textView2);
         CashBalanceDisplay = findViewById(R.id.CashBalanceDisplay);
         searchPortal = findViewById(R.id.searchPortal);
@@ -82,12 +82,14 @@ public class Activity2 extends AppCompatActivity {
         String currentUser = mFirebaseAuth.getCurrentUser().getUid();
 
         getAccountBalance(currentUser);
+        AccountCollection(currentUser,gameRange);
+        arenaQualification(currentUser);
 
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    //Log.d("TAG", task.getResult().size() + "");
+
                     int numberOfDocuments = task.getResult().size();
 
                     if (numberOfDocuments == 0){
@@ -97,11 +99,11 @@ public class Activity2 extends AppCompatActivity {
                         });
 
                     }else if(numberOfDocuments < 5){
-                        String permission = "F";
-                        activity2Button.setOnClickListener(view -> {
-                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                        });
 
+                        String permission = "F";
+                        //Restriction after a game has been played, and when some users have exited the Portal
+                        playedGameRestriction(currentUser );
+                        
                     }else{
                         Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
                     }
@@ -124,12 +126,47 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                openActivity4(currentUser);
+                GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            int participants = task.getResult().size();
+                            if (participants >= 1){
+                                goToActivity4.setVisibility(View.GONE);
+                            }else{
+                                Toast.makeText(getApplicationContext()," Getting set ", Toast.LENGTH_SHORT).show();
+                            }
+                        }else{
 
+                            goToActivity4.setOnClickListener(view -> {
+                                openActivity4(currentUser);
+                            });
+                        }
+                    }
+                });
             }
         });
 
+        getRecords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getTheRecords();
+            }
+        });
+    }
 
+    // background operations
+    class gameRule1 extends AsyncTask<String,Void,Void>{
+
+        @Override
+        protected Void doInBackground(String... UserID) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+        }
     }
 
     public void insertDataDocuments(String UserID, String permission, int Amount, int gameCode, String gameStart,String gameState){
@@ -161,6 +198,7 @@ public class Activity2 extends AppCompatActivity {
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                //Check if user balance is qualified for a particular game portal.
                 if (task.isSuccessful()) {
                     //Log.d("TAG", task.getResult().size() + "");
                     int numberOfDocuments = task.getResult().size();
@@ -188,25 +226,35 @@ public class Activity2 extends AppCompatActivity {
             }
         });
 
-        Intent intent = new Intent(Activity2.this,Activity4.class);
+        Intent intent = new Intent(Activity2.this, Activity4.class);
         startActivity(intent);
         finish();
     }
 
+    //background operation
     public void AccountCollection(String UserID, int AccountBalance){
-        Map<String, Object>accountCollection = new HashMap<>();
-        accountCollection.put("UserID",UserID);
-        accountCollection.put("AmountBalance", AccountBalance);
+        Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    if(!task.getResult().exists()){
+                        Map<String, Object>accountCollection = new HashMap<>();
+                        accountCollection.put("UserID",UserID);
+                        accountCollection.put("AmountBalance", AccountBalance);
 
-        Accounts.document(UserID).set(accountCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull @NotNull Exception e) {
-                Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+                        Accounts.document(UserID).set(accountCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull @NotNull Exception e) {
+                                Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
             }
         });
     }
@@ -231,18 +279,61 @@ public class Activity2 extends AppCompatActivity {
         });
     }
 
-    /*public void readyToPlay(String userID){
-        GamePortals.whereEqualTo("UserID",userID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    public void getTheRecords(){
+        Intent intent = new Intent(Activity2.this, Activity5.class);
+        startActivity(intent);
+    }
+
+    //background operation
+    public void arenaQualification(String userID){
+        Accounts.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot document= task.getResult();
+
+                if (document.exists()){
+                    double AccountBalance = Double.parseDouble(String.valueOf(document.get("AmountBalance")));
+
+                    if (AccountBalance < gameRange){
+                        activity2Button.setVisibility(View.GONE);
+                        goToActivity4.setVisibility(View.GONE);
+                        Toast.makeText(getApplicationContext(),"Please top up your account", Toast.LENGTH_SHORT).show();
+                        //an intent to a top up page for an api
+                    }else{
+                        activity2Button.setVisibility(View.VISIBLE);
+                        goToActivity4.setVisibility(View.VISIBLE);
+                    }
+                }else {
+                    Toast.makeText(getApplicationContext(),"Account does not exists", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
+
+    //background operation
+    public void playedGameRestriction(String userID){
+        GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    QuerySnapshot document = task.getResult();
-                    Map<String, Object> readyToStart = new HashMap<>();
-                    readyToStart.put("GameStart","True");
-
-                    GamePortals.document()
+                if (task.isSuccessful()){
+                    int participants = task.getResult().size();
+                    if (participants >= 1){
+                        activity2Button.setVisibility(View.GONE);
+                    }else{
+                        activity2Button.setOnClickListener(view -> {
+                            insertDataDocuments(userID,permission,gameRange,luckyNumber,GameStart,GameState);
+                            activity2Button.setVisibility(View.GONE);
+                        });
+                        Toast.makeText(getApplicationContext()," Join Arena ", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    activity2Button.setOnClickListener(view -> {
+                        insertDataDocuments(userID,permission,gameRange,luckyNumber,GameStart,GameState);
+                    });
                 }
             }
         });
-    }*/
+    }
+
 }

@@ -6,11 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".Activity5">
 
-    <androidx.recyclerview.widget.RecyclerView
+   <!-- <androidx.recyclerview.widget.RecyclerView
         android:layout_width="412dp"
         android:layout_height="739dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />-->
+   <TextView
+       android:id="@+id/displayDataRecordsInfo"
+       android:layout_width="336dp"
+       android:layout_height="262dp"
+       android:gravity="center"
+       android:hint="Player records "
+       android:text=""
+       android:textAlignment="center"
+       android:textColor="#F44336"
+       android:textSize="14dp"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
