@@ -1,10 +1,8 @@
-
-
 package com.example.cashbooster;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -43,6 +41,7 @@ public class Activity2 extends AppCompatActivity {
     CollectionReference Accounts;
 
     String collectionName;
+    String portalNameHolder;
 
     CollectionReference GamePortals;
     Random randomNumber = new Random();
@@ -52,10 +51,12 @@ public class Activity2 extends AppCompatActivity {
     String GameState;
     String GameStart;
     String AccountsCollectionName = "Accounts";
+
     {
+        portalNameHolder = "";
         collectionName = "GamePortals";
         GamePortals = db.collection(collectionName);
-        luckyNumber = randomNumber.nextInt(9999-100) + 1;
+        luckyNumber = randomNumber.nextInt(9999 - 100) + 1;
         gameRange = 2000;
         permission = "A";
         GameStart = "None";
@@ -84,6 +85,10 @@ public class Activity2 extends AppCompatActivity {
         getAccountBalance(currentUser);
         AccountCollection(currentUser,gameRange);
         arenaQualification(currentUser);
+        //peepAndCheck();
+
+        //Restriction after a game has been played, and when some users have exited the Portal
+        playedGameRestriction(currentUser );
 
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -101,14 +106,17 @@ public class Activity2 extends AppCompatActivity {
                     }else if(numberOfDocuments < 5){
 
                         String permission = "F";
-                        //Restriction after a game has been played, and when some users have exited the Portal
-                        playedGameRestriction(currentUser );
-                        
+                        activity2Button.setOnClickListener(view -> {
+                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
+                        });
+
                     }else{
                         Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
+
+                        //background operation (continuous check if the portal is full, if full set activity2Button GONE
+                        activity2Button.setVisibility(View.GONE);
                     }
                 } else {
-
                     Toast.makeText(getApplicationContext(),"Could not count the number of documents in GamePortals", Toast.LENGTH_SHORT).show();
                 }
 
@@ -134,13 +142,15 @@ public class Activity2 extends AppCompatActivity {
                             if (participants >= 1){
                                 goToActivity4.setVisibility(View.GONE);
                             }else{
+
+                                goToActivity4.setOnClickListener(view -> {
+                                    openActivity4(currentUser);
+                                });
                                 Toast.makeText(getApplicationContext()," Getting set ", Toast.LENGTH_SHORT).show();
                             }
                         }else{
 
-                            goToActivity4.setOnClickListener(view -> {
-                                openActivity4(currentUser);
-                            });
+                            Toast.makeText(getApplicationContext()," Task does not exists !!!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -155,20 +165,7 @@ public class Activity2 extends AppCompatActivity {
         });
     }
 
-    // background operations
-    class gameRule1 extends AsyncTask<String,Void,Void>{
-
-        @Override
-        protected Void doInBackground(String... UserID) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void unused) {
-            super.onPostExecute(unused);
-        }
-    }
-
+    //############################################ System functionalities... ########################################################
     public void insertDataDocuments(String UserID, String permission, int Amount, int gameCode, String gameStart,String gameState){
         Map<String, Object>gamePortal = new HashMap<>();
         gamePortal.put("UserID",UserID);
@@ -218,6 +215,9 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onSuccess(Void unused) {
                 Toast.makeText(getApplicationContext(),"user is Ready !!!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Activity2.this, Activity4.class);
+                startActivity(intent);
+                finish();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -226,57 +226,85 @@ public class Activity2 extends AppCompatActivity {
             }
         });
 
-        Intent intent = new Intent(Activity2.this, Activity4.class);
-        startActivity(intent);
-        finish();
     }
 
     //background operation
     public void AccountCollection(String UserID, int AccountBalance){
-        Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()){
-                    if(!task.getResult().exists()){
-                        Map<String, Object>accountCollection = new HashMap<>();
-                        accountCollection.put("UserID",UserID);
-                        accountCollection.put("AmountBalance", AccountBalance);
 
-                        Accounts.document(UserID).set(accountCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
+        //Handler handler = new Handler();
+
+        Runnable setAccountBg = new Runnable() {
+            @Override
+            public void run() {
+                Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            if(!task.getResult().exists()){
+                                Map<String, Object>accountCollection = new HashMap<>();
+                                accountCollection.put("UserID",UserID);
+                                accountCollection.put("AmountBalance", AccountBalance);
+
+                                Accounts.document(UserID).set(accountCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull @NotNull Exception e) {
+                                        Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull @NotNull Exception e) {
-                                Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        }
                     }
-                }
+                });
             }
-        });
+        };
+
+        Thread setAccount = new Thread(setAccountBg);
+        setAccount.start();
     }
 
+    //background operation
     public void getAccountBalance(String UserID){
-        Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    DocumentSnapshot document = task.getResult();
-                    if(document.exists()){
-                        CashBalanceDisplay.setText(String.valueOf(document.get("AmountBalance")));
-                    }else {
-                        CashBalanceDisplay.setText("N/A");
-                        Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
-                    }
 
-                }else{
-                    Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
-                }
+        Handler handler;
+        handler = new Handler();
+
+        Runnable getAccountBalance = new Runnable() {
+            @Override
+            public void run() {
+                Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+
+                            Runnable iteratedCheck = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(document.exists()){
+                                        CashBalanceDisplay.setText(String.valueOf(document.get("AmountBalance")));
+                                    }else {
+                                        CashBalanceDisplay.setText("N/A");
+                                        handler.postDelayed(this,5000);
+                                        Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            };
+                            handler.post(iteratedCheck);
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
-        });
+        };
+
+        Thread accountBalance = new Thread(getAccountBalance);
+        accountBalance.start();
     }
 
     public void getTheRecords(){
@@ -286,54 +314,112 @@ public class Activity2 extends AppCompatActivity {
 
     //background operation
     public void arenaQualification(String userID){
-        Accounts.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+        Runnable aQualification = new Runnable() {
             @Override
-            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot document= task.getResult();
+            public void run() {
+                Accounts.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document= task.getResult();
 
-                if (document.exists()){
-                    double AccountBalance = Double.parseDouble(String.valueOf(document.get("AmountBalance")));
+                        if (document.exists()){
+                            double AccountBalance = Double.parseDouble(String.valueOf(document.get("AmountBalance")));
 
-                    if (AccountBalance < gameRange){
-                        activity2Button.setVisibility(View.GONE);
-                        goToActivity4.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(),"Please top up your account", Toast.LENGTH_SHORT).show();
-                        //an intent to a top up page for an api
-                    }else{
-                        activity2Button.setVisibility(View.VISIBLE);
-                        goToActivity4.setVisibility(View.VISIBLE);
+                            if (AccountBalance < gameRange){
+                                activity2Button.setVisibility(View.GONE);
+                                goToActivity4.setVisibility(View.GONE);
+                                Toast.makeText(getApplicationContext(),"Please top up your account", Toast.LENGTH_SHORT).show();
+                                //an intent to a top up page for an api
+                            }else{
+                                activity2Button.setVisibility(View.VISIBLE);
+                                goToActivity4.setVisibility(View.VISIBLE);
+                            }
+                        }else {
+                            Toast.makeText(getApplicationContext(),"Account does not exists", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
-                }else {
-                    Toast.makeText(getApplicationContext(),"Account does not exists", Toast.LENGTH_SHORT).show();
-                }
-
+                });
             }
-        });
+        };
+
+        Thread ArenaQBgThread = new Thread(aQualification);
+        ArenaQBgThread.start();
+
     }
 
     //background operation
     public void playedGameRestriction(String userID){
-        GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+        Runnable pGameRestriction = new Runnable() {
             @Override
-            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    int participants = task.getResult().size();
-                    if (participants >= 1){
-                        activity2Button.setVisibility(View.GONE);
-                    }else{
-                        activity2Button.setOnClickListener(view -> {
-                            insertDataDocuments(userID,permission,gameRange,luckyNumber,GameStart,GameState);
-                            activity2Button.setVisibility(View.GONE);
-                        });
-                        Toast.makeText(getApplicationContext()," Join Arena ", Toast.LENGTH_SHORT).show();
+            public void run() {
+                GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+
+                            int participants = task.getResult().size();
+
+                            if (participants >= 1){
+                                activity2Button.setVisibility(View.GONE);
+                            }else{
+                                activity2Button.setVisibility(View.VISIBLE);
+                                Toast.makeText(getApplicationContext()," Join Arena ", Toast.LENGTH_SHORT).show();
+                            }
+                        }else{
+                            activity2Button.setVisibility(View.VISIBLE);
+                        }
                     }
-                }else{
-                    activity2Button.setOnClickListener(view -> {
-                        insertDataDocuments(userID,permission,gameRange,luckyNumber,GameStart,GameState);
-                    });
-                }
+                });
             }
-        });
+        };
+
+        Thread gameRestrictionBgThread = new Thread(pGameRestriction);
+        gameRestrictionBgThread.start();
+
     }
 
+    //background operation
+    public void peepAndCheck(){
+
+        Handler handler;
+        handler = new Handler();
+
+        Runnable innerThread = new Runnable() {
+            @Override
+            public void run() {
+                GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            int noReadyParticipants = task.getResult().size();
+
+                            Runnable iteratedCheck = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(noReadyParticipants == 5){
+                                        Intent intent = new Intent(Activity2.this, Activity4.class);
+                                        startActivity(intent);
+                                        finish();
+
+                                    }else {
+                                        handler.postDelayed(this,5000);
+                                    }
+                                }
+
+                            };
+                            handler.post(iteratedCheck);
+                        }else{
+                            Toast.makeText(getApplicationContext()," task was not successful ", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        };
+
+        Thread peepThread = new Thread(innerThread);
+        peepThread.start();
+    }
 }

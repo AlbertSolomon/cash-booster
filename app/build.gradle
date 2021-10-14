@@ -32,18 +32,6 @@ android {
         viewBinding true
     }
     packagingOptions {
-        /*resources.excludes.add('META-INF/*')
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude("META-INF/*.kotlin_module")
-        exclude 'META-INF/proguard/androidx-annotations.pro'
-        exclude 'META-INF/rxjava.properties'*/
         pickFirst 'androidsupportmultidexversion.txt'
     }
 }
@@ -57,6 +45,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.5'
 
     implementation 'com.intellij:annotations:12.0@jar'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     implementation platform('com.google.firebase:firebase-bom:28.4.1')
     implementation 'com.google.firebase:firebase-analytics'

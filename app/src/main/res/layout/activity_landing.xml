@@ -4,19 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".LandingActivity">
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="243dp"
+        android:layout_height="82dp"
+        android:layout_marginTop="72dp"
+        android:gravity="center"
+        android:text="CHOOSE ARENA"
+        android:textAlignment="center"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/enterPortals3"
+        android:layout_width="112dp"
+        android:layout_height="117dp"
+        android:layout_marginEnd="56dp"
+        android:layout_marginRight="56dp"
+        android:layout_marginBottom="304dp"
+        android:background="@drawable/rounded_corner_solid_btn"
+        android:elevation="8dp"
+        android:text="3 of 5"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/enterPortals"
-        android:layout_width="194dp"
-        android:layout_height="65dp"
-        android:text="Enter Arena"
-        android:textStyle="bold"
-        android:textSize="18dp"
+        android:layout_width="112dp"
+        android:layout_height="117dp"
         android:background="@drawable/rounded_corner_solid_btn"
+        android:elevation="8dp"
+        android:text="4 of 5"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/enterPortals3"
+        app:layout_constraintHorizontal_bias="0.447"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6"
+        app:layout_constraintVertical_bias="0.332" />
+
+    <View
+        android:layout_width="1611dp"
+        android:layout_height="274dp"
+        android:background="@drawable/ic_bottomwave"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.309"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,5 @@
 package com.example.cashbooster;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.String.valueOf;
 
 public class Activity4 extends AppCompatActivity {
-    //RecyclerView displayData;
     TextView displayData, displayBalance, displayCode;
     Button playGame;
     //String TAG;
@@ -67,12 +67,14 @@ public class Activity4 extends AppCompatActivity {
         String currentUser;
         {
             currentUser = mFirebaseAuth.getCurrentUser().getUid();
-            //CurrentUserDocument = db.document(currentUser);
+
         }
 
         getAccountBalance(currentUser);
         getGameCode(currentUser);
-        playGameVisible(); //new
+        //playGameVisible(currentUser); //new
+        //autoSelectWinnersOnIdeal(currentUser);
+
 
         playGame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,20 +83,37 @@ public class Activity4 extends AppCompatActivity {
                 //SelectWinners();
                 //displayResults(currentUser);
 
+                //Checking for user permission (A stand for Admin anf F for follower
+                //A user with the permission of A (mobile will process selection of winners.
                 GamePortals.document(currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()){
+
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()){
-                                String AdministratorRPermission = String.valueOf(document.get("Permission"));
-                                String setToPlay = String.valueOf(document.get("GameStart"));
+                                String AdministratorRPermission = valueOf(document.get("Permission"));
+                                String setToPlay = valueOf(document.get("GameStart"));
 
                                 if(AdministratorRPermission.equals("A")  && setToPlay.equals("Ready")){
 
                                     SelectWinners(currentUser);
-                                    updateSystemAccount(currentUser);
-                                    enterArenas();
+                                    /*GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                            if (task.isSuccessful()){
+                                                int numberOfWinners = task.getResult().size();
+
+                                                if (numberOfWinners == 4){
+
+                                                    updateSystemAccount(currentUser);
+                                                    enterArenas();
+                                                }
+                                            }
+                                        }
+                                    });*/
+
+
                                     /**  The basic idea is to check if all users are ready (by counting documents where users are ready)
                                      * and introduce another field with value "True" which will be used to display data for different individuals.  **/
 
@@ -106,12 +125,10 @@ public class Activity4 extends AppCompatActivity {
                                     displayResults(currentUser);
                                     enterArenas();
                                 }
-
                             }
                         }
                     }
                 });
-
             }
         });
     }
@@ -131,14 +148,14 @@ public class Activity4 extends AppCompatActivity {
                     for (QueryDocumentSnapshot document: task.getResult()){
 
                         //displayData.setText(String.valueOf(document.get("GameCode")));
-                        numberPot.add(parseInt(String.valueOf(document.get("GameCode"))));
+                        numberPot.add(parseInt(valueOf(document.get("GameCode"))));
 
                     }
                     //shuffle(numberPot);
                     ArrayList<Integer> gameWinners;
                     gameWinners = new ArrayList<>();
 
-                    //displayData.setText(valueOf(numberPot.get(random.nextInt(numberPot.size()))));
+                    //selecting the winners
                     for(int i= 0; i< numberPot.size() - 1; i++){
 
                         boolean toGameWinners,gameLoser;
@@ -159,43 +176,51 @@ public class Activity4 extends AppCompatActivity {
                         //System.out.println("This a code for a loser!"+ numberPot);
 
                     }
-                        for(int counter = 1; counter < 5; counter++){
-                            GamePortals.whereEqualTo("GameCode", gameWinners.get(counter -1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                                    if(task.isSuccessful()){
-                                            for(QueryDocumentSnapshot document: task.getResult()){
-                                                if (gameWinners.size() <= 4){
+                    for(int counter = 1; counter < 5; counter++){
+                        int finalCounter = counter;
+                        GamePortals.whereEqualTo("GameCode", gameWinners.get(counter - 1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                if(task.isSuccessful()){
+                                    for(QueryDocumentSnapshot document: task.getResult()){
+                                        int winnerCode = Integer.parseInt(valueOf(document.get("GameCode")));
 
-                                                    Map<String, Object> updateWinner = new HashMap<>();
-                                                    updateWinner.put("GameState","Winner");
-                                                    GamePortals.document(document.getId()).update(updateWinner);
-                                                    Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_SHORT).show();
-                                                    //System.out.println(gameWinners);
+                                        // Trying to check/verify if the the random numbers that have been selected much with those in the db
+                                        if(gameWinners.get(finalCounter) == winnerCode){
+                                            Toast.makeText(getApplicationContext(),"These r the codes" + gameWinners.get(finalCounter), Toast.LENGTH_SHORT).show();
+                                        }
 
-                                                }else{
-                                                    /*Map<String, Object> updateLoser = new HashMap<>();
-                                                    updateLoser.put("GameState","Loser");
-                                                    GamePortals.document(document.getId()).update(updateLoser);
-                                                    Toast.makeText(getApplicationContext(),"Loser(s) updated", Toast.LENGTH_SHORT).show();*/
-                                                   // System.out.println("This a code for a loser!"+ numberPot);
+                                        //updating the db,
+                                        if (gameWinners.size() <= 4){
 
+                                            Map<String, Object> updateWinner = new HashMap<>();
+                                            updateWinner.put("GameState","Winner");
+                                            GamePortals.document(document.getId()).update(updateWinner);
+                                            Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_SHORT).show();
+                                            //System.out.println(gameWinners);
 
-                                                }
-                                            }
+                                        }else{
 
-                                    }else {
-                                        Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                                            /*Map<String, Object> updateLoser = new HashMap<>();
+                                            updateLoser.put("GameState","Loser");
+                                            GamePortals.document(document.getId()).update(updateLoser);
+                                            Toast.makeText(getApplicationContext(),"Loser(s) updated", Toast.LENGTH_SHORT).show();*/
+                                            // System.out.println("This a code for a loser!"+ numberPot);
+
+                                        }
                                     }
+
+                                }else {
+                                    Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
                                 }
-                            });
-                        }
+                            }
+                        });
+                    }
 
                     //displayData.setText(valueOf(gameWinners.get(1)));
                     //displayData.setText(valueOf(numberPot.size()));
                     //displayData.setText(valueOf(gameWinners.size()));
                     displayResults(userID);
-
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
@@ -216,11 +241,10 @@ public class Activity4 extends AppCompatActivity {
 
                     if (document.exists()){
 
-
                         if(document.get("GameState").equals("none")){
                             displayData.setText("Loser !!!");
                         }else{
-                            displayData.setText(String.valueOf(document.get("GameState")));
+                            displayData.setText(valueOf(document.get("GameState")));
                         }
                         //doing some calculations
                         systemCalculations(userID);
@@ -240,14 +264,14 @@ public class Activity4 extends AppCompatActivity {
                 if (task.isSuccessful()){
                     DocumentSnapshot GameDocument = task.getResult();
                     if (GameDocument.exists()){
-                        double UserAmount = Double.parseDouble(String.valueOf(GameDocument.get("Amount")));
+                        double UserAmount = Double.parseDouble(valueOf(GameDocument.get("Amount")));
 
                         if (GameDocument.get("GameState").equals("Winner")){
                             Accounts.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                                     DocumentSnapshot AccountsDocument = task.getResult();
-                                    double balance = Double.parseDouble(String.valueOf(AccountsDocument.get("AmountBalance")));
+                                    double balance = Double.parseDouble(valueOf(AccountsDocument.get("AmountBalance")));
 
                                     double AmountWon = UserAmount * 0.2;
                                     double total = balance + AmountWon;
@@ -257,7 +281,7 @@ public class Activity4 extends AppCompatActivity {
                                     Accounts.document(userID).update(updateTotal);
 
                                     //Storing and deleting records
-                                    storeRecords(userID);
+                                    //storeRecords(userID);
                                 }
                             });
                         }
@@ -266,7 +290,7 @@ public class Activity4 extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                                     DocumentSnapshot AccountsDocument = task.getResult();
-                                    double balance = Double.parseDouble(String.valueOf(AccountsDocument.get("AmountBalance")));
+                                    double balance = Double.parseDouble(valueOf(AccountsDocument.get("AmountBalance")));
 
                                     double accountBalance = balance - UserAmount;
 
@@ -275,7 +299,7 @@ public class Activity4 extends AppCompatActivity {
                                     Accounts.document(userID).update(updateBalance);
 
                                     //Storing and deleting records
-                                    storeRecords(userID);
+                                    //storeRecords(userID);
                                 }
                             });
                         }else{
@@ -288,6 +312,7 @@ public class Activity4 extends AppCompatActivity {
             }
         });
     }
+
     public void updateSystemAccount(String userID){
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -304,7 +329,8 @@ public class Activity4 extends AppCompatActivity {
 
                             if (document.exists()){
 
-                                double UserAmount  = Double.parseDouble(String.valueOf(document.get("Amount")));
+                                double UserAmount  = Double.parseDouble(valueOf(document.get("Amount")));
+
                                 Accounts.document("systemAccount").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
@@ -312,7 +338,7 @@ public class Activity4 extends AppCompatActivity {
                                             DocumentSnapshot systemDocument = task.getResult();
 
                                             if (systemDocument.exists()){
-                                                double systemBalance = Double.parseDouble(String.valueOf(systemDocument.get("AmountBalance")));
+                                                double systemBalance = Double.parseDouble(valueOf(systemDocument.get("AmountBalance")));
 
                                                 if (numberOfDocuments == 5){
                                                     double AmountWon = UserAmount * 0.2;
@@ -320,7 +346,8 @@ public class Activity4 extends AppCompatActivity {
 
                                                     Map<String, Object> updateTotal = new HashMap<>();
                                                     updateTotal.put("AmountBalance",total);
-                                                    Accounts.document(userID).update(updateTotal);
+                                                    Accounts.document("systemAccount").update(updateTotal);
+
                                                 }else{
                                                     Toast.makeText(getApplicationContext(),"System Account, user population does meet specifies requirements.", Toast.LENGTH_SHORT).show();
                                                 }
@@ -357,9 +384,9 @@ public class Activity4 extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                DocumentSnapshot document = task.getResult();
-               String gameCode = String.valueOf(document.get("GameCode"));
-               String gameState = String.valueOf(document.get("GameState"));
-               String Amount = String.valueOf(document.get("Amount"));
+               String gameCode = valueOf(document.get("GameCode"));
+               String gameState = valueOf(document.get("GameState"));
+               String Amount = valueOf(document.get("Amount"));
 
                GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                    @Override
@@ -394,9 +421,7 @@ public class Activity4 extends AppCompatActivity {
                                }else{
                                    Toast.makeText(getApplicationContext(),"Error occurred while saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
                                }
-
                            }
-
                        }
                    }
                });
@@ -426,7 +451,7 @@ public class Activity4 extends AppCompatActivity {
                 if(task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
-                        displayBalance.setText(String.valueOf(document.get("AmountBalance")));
+                        displayBalance.setText(valueOf(document.get("AmountBalance")));
                     }else {
                         displayBalance.setText("N/A");
                         Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
@@ -446,7 +471,7 @@ public class Activity4 extends AppCompatActivity {
                 if (task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
-                        displayCode.setText(String.valueOf(document.get("GameCode")));
+                        displayCode.setText(valueOf(document.get("GameCode")));
                     }else{
                         displayCode.setText("N/A");
                     }
@@ -460,28 +485,109 @@ public class Activity4 extends AppCompatActivity {
     public void enterArenas(){
         Intent intent = new Intent(Activity4.this,LandingActivity.class);
         startActivity(intent);
+        finish();
+    }
 
-    } //new
+    //Background operation
+    public void playGameVisible(String userID){
+        Handler handler;
+        handler = new Handler();
 
-    public void playGameVisible(){
-
-        GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        Runnable checkVisibility = new Runnable() {
             @Override
-            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    int readyParticipant = task.getResult().size();
-                    if (readyParticipant == 5){
-                        playGame.setVisibility(View.VISIBLE);
-                    }else {
-                        playGame.setVisibility(View.GONE);
+            public void run() {
+                GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            int readyParticipant = task.getResult().size();
+
+                            GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()){
+                                        int numberOfWinners = task.getResult().size();
+
+                                        GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                                                if(task.isSuccessful()){
+                                                    DocumentSnapshot document = task.getResult();
+
+                                                    if (document.exists()){
+                                                        String permission = valueOf(document.get("Permission"));
+
+                                                        if (permission.equals("A")){
+
+                                                            playGame.setVisibility(View.VISIBLE);
+
+                                                        }else if (readyParticipant == 5 && numberOfWinners >= 1){
+                                                            playGame.setVisibility(View.VISIBLE);
+                                                        }else {
+                                                            playGame.setVisibility(View.GONE);
+                                                        }
+
+                                                    }else{
+                                                        Toast.makeText(getApplicationContext(),"document does not exists", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }else {
+                                                    Toast.makeText(getApplicationContext(),"retrieving results didn't occur ", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                                    }else{
+                                        Toast.makeText(getApplicationContext(),"winners not available, something went wrong ", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                        }else {
+                            Intent intent = new Intent(Activity4.this,Activity2.class);
+                            startActivity(intent);
+                            Toast.makeText(getApplicationContext(),"Something went wrong !!!", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }else {
-                    Intent intent = new Intent(Activity4.this,Activity2.class);
-                    startActivity(intent);
-                    Toast.makeText(getApplicationContext(),"Something went wrong !!!", Toast.LENGTH_SHORT).show();
-                }
+                });
+
+                handler.postDelayed(this,5000);
             }
-        });
-    } //new
+        };
+        handler.post(checkVisibility);
+
+    }
+
+    //Background operation
+    public void autoSelectWinnersOnIdeal(String userID){
+        Handler handler;
+        handler = new Handler();
+
+        Runnable autoSelectOnIdeal = new Runnable() {
+            @Override
+            public void run() {
+
+                GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()){
+                                String permission = valueOf(document.get("Permission"));
+
+                                if (permission.equals("A")){
+                                    //SelectWinners(userID);
+                                    //systemCalculations(userID);
+                                }
+
+                            }else {
+                                Toast.makeText(getApplicationContext()," Document does not exist !!!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+                handler.postDelayed(this,60000*5);
+            }
+        };
+        handler.post(autoSelectOnIdeal);
+    }
 
 }
