@@ -26,16 +26,18 @@
         android:id="@+id/enterPortals3"
         android:layout_width="112dp"
         android:layout_height="117dp"
-        android:layout_marginEnd="56dp"
-        android:layout_marginRight="56dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginRight="64dp"
         android:layout_marginBottom="304dp"
         android:background="@drawable/rounded_corner_solid_btn"
         android:elevation="8dp"
-        android:text="3 of 5"
+        android:text="4 of 5"
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6"
+        app:layout_constraintVertical_bias="0.98" />
 
     <Button
         android:id="@+id/enterPortals"
@@ -43,7 +45,7 @@
         android:layout_height="117dp"
         android:background="@drawable/rounded_corner_solid_btn"
         android:elevation="8dp"
-        android:text="4 of 5"
+        android:text="3 of 5"
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

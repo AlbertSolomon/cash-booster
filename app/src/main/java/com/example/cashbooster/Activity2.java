@@ -1,6 +1,7 @@
 package com.example.cashbooster;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,35 +37,35 @@ public class Activity2 extends AppCompatActivity {
 
     Button activity2Button, searchPortal, goToActivity4, getRecords;
     TextView textView2, CashBalanceDisplay;
+    CardView card1k,card2k,card5k,card10k,card20k,card50k,card100k;
 
     FirebaseAnalytics TestFirebaseAnalytics;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     CollectionReference Accounts;
 
-    String collectionName;
-    String portalNameHolder;
+    String collectionName, portalNameHolder;
 
     CollectionReference GamePortals;
     Random randomNumber = new Random();
     int gameRange;
     int luckyNumber;
-    String permission;
-    String GameState;
-    String GameStart;
-    String AccountsCollectionName = "Accounts";
+    String permission, GameState, GameStart, AccountsCollectionName;
+    boolean natureOfPortal;
 
     {
+        AccountsCollectionName = "Accounts";
         portalNameHolder = "";
         collectionName = "GamePortals";
         GamePortals = db.collection(collectionName);
         luckyNumber = randomNumber.nextInt(9999 - 100) + 1;
-        gameRange = 2000;
         permission = "A";
-        GameStart = "None";
+        GameStart = "Ready";
         GameState = "None";
+        gameRange = 2000;
         Accounts = db.collection(AccountsCollectionName);
-
     }
+
+    public static final String dataHolder = "com.example.cashbooster.TEXT_TO_SEND";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,19 +80,29 @@ public class Activity2 extends AppCompatActivity {
         searchPortal = findViewById(R.id.searchPortal);
         goToActivity4 = findViewById(R.id.goToActivity4);
 
+        //CardView Declarations test
+        card1k = findViewById(R.id.card1k);
+        card2k = findViewById(R.id.card2k);
+        card5k = findViewById(R.id.card5k);
+        card10k = findViewById(R.id.card10k);
+        card20k = findViewById(R.id.card20k);
+        card50k = findViewById(R.id.card50k);
+        card100k = findViewById(R.id.card100k);
+
         TestFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         String currentUser = mFirebaseAuth.getCurrentUser().getUid();
 
         getAccountBalance(currentUser);
         AccountCollection(currentUser,gameRange);
-        arenaQualification(currentUser);
+
+        //arenaQualification(currentUser);
         //peepAndCheck();
 
         //Restriction after a game has been played, and when some users have exited the Portal
-        playedGameRestriction(currentUser );
+        //playedGameRestriction(currentUser );
 
-        db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -139,15 +151,15 @@ public class Activity2 extends AppCompatActivity {
                     public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()){
                             int participants = task.getResult().size();
-                            if (participants >= 1){
-                                goToActivity4.setVisibility(View.GONE);
-                            }else{
+                            //if (participants >= 1){
+                               // goToActivity4.setVisibility(View.GONE);
+                           // }else{
 
                                 goToActivity4.setOnClickListener(view -> {
                                     openActivity4(currentUser);
                                 });
                                 Toast.makeText(getApplicationContext()," Getting set ", Toast.LENGTH_SHORT).show();
-                            }
+                            //}
                         }else{
 
                             Toast.makeText(getApplicationContext()," Task does not exists !!!", Toast.LENGTH_SHORT).show();
@@ -163,32 +175,202 @@ public class Activity2 extends AppCompatActivity {
                 getTheRecords();
             }
         });
+
+        //############################## 1k ################################################
+        card1k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 1000;
+                String collectionName = "GamePortal1k";
+
+                //collection reference for a specific card portal(game amount)
+                CollectionReference GamePortal = db.collection(collectionName);
+
+                //passing values to next activity
+                //Intent intent = new Intent();
+               // intent.putExtra("gameRange",gameRange);
+                //intent.putExtra("collectionName",collectionName);
+               // startActivity(intent);
+
+                    //how to retrieve values from intent in the next activity
+                    /**
+                     * Intent intent = getIntent();
+                     * String collectionName = intent.getStringExtra("collectionName");
+                     * **/
+            }
+        });
+
+        //################################# 2k ############################################
+        card2k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 2000;
+                //String collectionName = "GamePortal2k";
+
+                //collection reference for a specific card portal(game amount) password: cashbooster000
+                //CollectionReference GamePortals = db.collection(collectionName);
+
+                /*GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            int numberOfPlayers = task.getResult().size();
+
+                            if (numberOfPlayers == 5){
+
+                                Toast.makeText(getApplicationContext(),"Sorry the portal is full!!!", Toast.LENGTH_LONG).show();
+
+                            }else {
+                                insertingAndCreatingPortals(collectionName,currentUser);
+                                //passing values to next activity
+                                Intent intent = new Intent(Activity2.this, Activity4.class);
+                                //intent.putExtra("gameRange",gameRange);
+                                intent.putExtra("collectionName",collectionName);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    }
+                });*/
+
+
+                GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            int participants = task.getResult().size();
+                            //if (participants >= 1){
+                            // goToActivity4.setVisibility(View.GONE);
+                            // }else{
+
+                                openActivity4(currentUser);
+                            Toast.makeText(getApplicationContext()," Getting set ", Toast.LENGTH_SHORT).show();
+                            //}
+                        }else{
+
+                            Toast.makeText(getApplicationContext()," Task does not exists !!!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+            }
+        });
+
+        //################################# 5k ############################################
+        card5k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 5000;
+                String collectionName = "GamePortal5k";
+
+                //collection reference for a specific card portal(game amount)
+                CollectionReference GamePortal = db.collection(collectionName);
+            }
+        });
+
+        //################################### 10k ##########################################
+        card10k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 10000;
+                String collectionName = "GamePortal10k";
+
+                //collection reference for a specific card portal(game amount)
+                CollectionReference GamePortal = db.collection(collectionName);
+            }
+        });
+
+        //############################### 20k ##############################################
+        card20k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 20000;
+                String collectionName = "GamePortal20k";
+
+                //collection reference for a specific card portal(game amount)
+                CollectionReference GamePortal = db.collection(collectionName);
+            }
+        });
+
+        //############################ 50k #################################################
+        card50k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 50000;
+                String collectionName = "GamePortal50k";
+
+                //collection reference for a specific card portal(game amount)
+                CollectionReference GamePortal = db.collection(collectionName);
+
+
+            }
+        });
+
+        //################################ 100k #############################################
+        card100k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameRange = 100000;
+                String collectionName = "GamePortal100k";
+
+                //collection reference for a specific card portal(game amount)
+                CollectionReference GamePortal = db.collection(collectionName);
+            }
+        });
+    }
+
+    //################################################## ASYNC TASK (CLASS DECLARATION) #####################################################
+    public class JoiningPortals extends AsyncTask<String,String,String>{
+        @Override
+        protected void onPreExecute(){
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String string){
+            super.onPostExecute(string);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return null;
+        }
     }
 
     //############################################ System functionalities... ########################################################
     public void insertDataDocuments(String UserID, String permission, int Amount, int gameCode, String gameStart,String gameState){
-        Map<String, Object>gamePortal = new HashMap<>();
-        gamePortal.put("UserID",UserID);
-        gamePortal.put("Permission",permission);
-        gamePortal.put("Amount",Amount);
-        gamePortal.put("GameCode",gameCode);
-        gamePortal.put("GameStart",gameStart);
-        gamePortal.put("GameState",gameState);
-        //gamePortal.put("Created", Timestamp.now());
 
-        db.collection("GamePortals").document(UserID).set(gamePortal).addOnSuccessListener(new OnSuccessListener<Void>() {
+        Runnable insertDataDocuments = new Runnable() {
             @Override
-            public void onSuccess(Void unused) {
+            public void run() {
+                Map<String, Object>gamePortal = new HashMap<>();
+                gamePortal.put("UserID",UserID);
+                gamePortal.put("Permission",permission);
+                gamePortal.put("Amount",Amount);
+                gamePortal.put("GameCode",gameCode);
+                gamePortal.put("GameStart",gameStart);
+                gamePortal.put("GameState",gameState);
+                //gamePortal.put("Created", Timestamp.now());
 
-                Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull @NotNull Exception e) {
+                db.collection(collectionName).document(UserID).set(gamePortal).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
 
-                Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+
+                        Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        });
+        };
+
+        Thread insertInDocuments = new Thread(insertDataDocuments);
+        insertInDocuments.start();
     }
 
     public void searchPortals(){
@@ -232,7 +414,6 @@ public class Activity2 extends AppCompatActivity {
     public void AccountCollection(String UserID, int AccountBalance){
 
         //Handler handler = new Handler();
-
         Runnable setAccountBg = new Runnable() {
             @Override
             public void run() {
@@ -422,4 +603,51 @@ public class Activity2 extends AppCompatActivity {
         Thread peepThread = new Thread(innerThread);
         peepThread.start();
     }
+
+    public void insertingAndCreatingPortals(String collectionName,String UserID){
+
+        Runnable RunningInsertAndCreate = new Runnable() {
+            @Override
+            public void run() {
+                db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            int numberOfDocuments = task.getResult().size();
+
+                            if (numberOfDocuments == 0){
+                                String permission = "A";
+                                activity2Button.setOnClickListener(view -> {
+                                    insertDataDocuments(UserID,permission,gameRange,luckyNumber,GameStart,GameState);
+                                });
+
+                            }else if(numberOfDocuments < 5){
+
+                                String permission = "F";
+                                activity2Button.setOnClickListener(view -> {
+                                    insertDataDocuments(UserID,permission,gameRange,luckyNumber,GameStart,GameState);
+                                });
+
+                            }else{
+                                Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
+
+                                //background operation (continuous check if the portal is full, if full set activity2Button GONE
+                                activity2Button.setVisibility(View.GONE);
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(),"Could not count the number of documents in GamePortals", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+            }
+        };
+
+        Thread runningIAndCThread = new Thread(RunningInsertAndCreate);
+        runningIAndCThread.start();
+    }
+
+    //background operations, checking if portals
+
 }

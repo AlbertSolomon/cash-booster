@@ -1,5 +1,6 @@
 package com.example.cashbooster;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,7 +9,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,6 +36,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
 
 public class Activity4 extends AppCompatActivity {
+    //RecyclerView displayData;
     TextView displayData, displayBalance, displayCode;
     Button playGame;
     //String TAG;
@@ -43,6 +44,7 @@ public class Activity4 extends AppCompatActivity {
     CollectionReference GamePortals, Accounts;
     String collectionName;
     String AccountsCollectionName = "Accounts";
+    boolean natureOfAdmin;
 
     FirebaseFirestore db;
     {
@@ -67,68 +69,58 @@ public class Activity4 extends AppCompatActivity {
         String currentUser;
         {
             currentUser = mFirebaseAuth.getCurrentUser().getUid();
-
+            //CurrentUserDocument = db.document(currentUser);
         }
 
         getAccountBalance(currentUser);
         getGameCode(currentUser);
-        //playGameVisible(currentUser); //new
-        //autoSelectWinnersOnIdeal(currentUser);
+        playGameVisible(); //new
 
+        GamePortals.document(currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()){
+                        String AdministratorRPermission = valueOf(document.get("Permission"));
 
+                        if(AdministratorRPermission.equals("A")){
+                            natureOfAdmin = true;
+                            //SelectWinners(currentUser);
+                            //updateSystemAccount(currentUser);
+                            //enterArenas();
+                            /**  The basic idea is to check if all users are ready (by counting documents where users are ready)
+                             * and introduce another field with value "True" which will be used to display data for different individuals.  **/
+
+                            //Making user that all users are ready before Processing and retrieving information
+                            //This is where i call a recycler view.
+
+                            //Making user that all users are ready before retrieving information
+                        }else if(AdministratorRPermission.equals("F")){
+                            //displayResults(currentUser);
+                            //enterArenas();
+                            natureOfAdmin = false;
+                        }
+
+                    }
+                }
+            }
+        });
         playGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //SelectWinners();
+                //SelectWinners(currentUser);
                 //displayResults(currentUser);
-
-                //Checking for user permission (A stand for Admin anf F for follower
-                //A user with the permission of A (mobile will process selection of winners.
-                GamePortals.document(currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
-
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()){
-                                String AdministratorRPermission = valueOf(document.get("Permission"));
-                                String setToPlay = valueOf(document.get("GameStart"));
-
-                                if(AdministratorRPermission.equals("A")  && setToPlay.equals("Ready")){
-
-                                    SelectWinners(currentUser);
-                                    /*GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()){
-                                                int numberOfWinners = task.getResult().size();
-
-                                                if (numberOfWinners == 4){
-
-                                                    updateSystemAccount(currentUser);
-                                                    enterArenas();
-                                                }
-                                            }
-                                        }
-                                    });*/
+                if (natureOfAdmin){
+                    SelectWinners(currentUser);
+                    updateSystemAccount(currentUser);
+                }else{
+                    displayResults(currentUser);
+;                }
 
 
-                                    /**  The basic idea is to check if all users are ready (by counting documents where users are ready)
-                                     * and introduce another field with value "True" which will be used to display data for different individuals.  **/
 
-                                    //Making user that all users are ready before Processing and retrieving information
-                                    //This is where i call a recycler view.
-
-                                    //Making user that all users are ready before retrieving information
-                                }else if(AdministratorRPermission.equals("F") && setToPlay.equals("Ready")){
-                                    displayResults(currentUser);
-                                    enterArenas();
-                                }
-                            }
-                        }
-                    }
-                });
             }
         });
     }
@@ -155,7 +147,7 @@ public class Activity4 extends AppCompatActivity {
                     ArrayList<Integer> gameWinners;
                     gameWinners = new ArrayList<>();
 
-                    //selecting the winners
+                    //displayData.setText(valueOf(numberPot.get(random.nextInt(numberPot.size()))));
                     for(int i= 0; i< numberPot.size() - 1; i++){
 
                         boolean toGameWinners,gameLoser;
@@ -177,20 +169,11 @@ public class Activity4 extends AppCompatActivity {
 
                     }
                     for(int counter = 1; counter < 5; counter++){
-                        int finalCounter = counter;
-                        GamePortals.whereEqualTo("GameCode", gameWinners.get(counter - 1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        GamePortals.whereEqualTo("GameCode", gameWinners.get(counter -1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                                 if(task.isSuccessful()){
                                     for(QueryDocumentSnapshot document: task.getResult()){
-                                        int winnerCode = Integer.parseInt(valueOf(document.get("GameCode")));
-
-                                        // Trying to check/verify if the the random numbers that have been selected much with those in the db
-                                        if(gameWinners.get(finalCounter) == winnerCode){
-                                            Toast.makeText(getApplicationContext(),"These r the codes" + gameWinners.get(finalCounter), Toast.LENGTH_SHORT).show();
-                                        }
-
-                                        //updating the db,
                                         if (gameWinners.size() <= 4){
 
                                             Map<String, Object> updateWinner = new HashMap<>();
@@ -200,12 +183,12 @@ public class Activity4 extends AppCompatActivity {
                                             //System.out.println(gameWinners);
 
                                         }else{
-
-                                            /*Map<String, Object> updateLoser = new HashMap<>();
-                                            updateLoser.put("GameState","Loser");
-                                            GamePortals.document(document.getId()).update(updateLoser);
-                                            Toast.makeText(getApplicationContext(),"Loser(s) updated", Toast.LENGTH_SHORT).show();*/
+                                                    /*Map<String, Object> updateLoser = new HashMap<>();
+                                                    updateLoser.put("GameState","Loser");
+                                                    GamePortals.document(document.getId()).update(updateLoser);
+                                                    Toast.makeText(getApplicationContext(),"Loser(s) updated", Toast.LENGTH_SHORT).show();*/
                                             // System.out.println("This a code for a loser!"+ numberPot);
+
 
                                         }
                                     }
@@ -221,6 +204,7 @@ public class Activity4 extends AppCompatActivity {
                     //displayData.setText(valueOf(numberPot.size()));
                     //displayData.setText(valueOf(gameWinners.size()));
                     displayResults(userID);
+
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
@@ -240,6 +224,7 @@ public class Activity4 extends AppCompatActivity {
                     //int Amount = parseInt(String.valueOf(document.get("Amount")));
 
                     if (document.exists()){
+
 
                         if(document.get("GameState").equals("none")){
                             displayData.setText("Loser !!!");
@@ -272,8 +257,9 @@ public class Activity4 extends AppCompatActivity {
                                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                                     DocumentSnapshot AccountsDocument = task.getResult();
                                     double balance = Double.parseDouble(valueOf(AccountsDocument.get("AmountBalance")));
+                                    Toast.makeText(getApplicationContext()," AccountBalance:"+balance, Toast.LENGTH_SHORT).show();
 
-                                    double AmountWon = UserAmount * 0.2;
+                                    double AmountWon = UserAmount * 0.25;
                                     double total = balance + AmountWon;
 
                                     Map<String, Object> updateTotal = new HashMap<>();
@@ -312,7 +298,6 @@ public class Activity4 extends AppCompatActivity {
             }
         });
     }
-
     public void updateSystemAccount(String userID){
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -330,7 +315,6 @@ public class Activity4 extends AppCompatActivity {
                             if (document.exists()){
 
                                 double UserAmount  = Double.parseDouble(valueOf(document.get("Amount")));
-
                                 Accounts.document("systemAccount").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
@@ -347,7 +331,6 @@ public class Activity4 extends AppCompatActivity {
                                                     Map<String, Object> updateTotal = new HashMap<>();
                                                     updateTotal.put("AmountBalance",total);
                                                     Accounts.document("systemAccount").update(updateTotal);
-
                                                 }else{
                                                     Toast.makeText(getApplicationContext(),"System Account, user population does meet specifies requirements.", Toast.LENGTH_SHORT).show();
                                                 }
@@ -383,48 +366,50 @@ public class Activity4 extends AppCompatActivity {
         GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-               DocumentSnapshot document = task.getResult();
-               String gameCode = valueOf(document.get("GameCode"));
-               String gameState = valueOf(document.get("GameState"));
-               String Amount = valueOf(document.get("Amount"));
+                DocumentSnapshot document = task.getResult();
+                String gameCode = valueOf(document.get("GameCode"));
+                String gameState = valueOf(document.get("GameState"));
+                String Amount = valueOf(document.get("Amount"));
 
-               GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                   @Override
-                   public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                       if (task.isSuccessful()){
+                GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
 
-                           int numberOfPlayers = task.getResult().size();
-                           if(gameState.equals("none")){
-                               values.put("gameCode",gameCode);
-                               values.put("portalRange",numberOfPlayers);
-                               values.put("GameState","lost");
-                               values.put("Amount",Amount);
+                            int numberOfPlayers = task.getResult().size();
+                            if(gameState.equals("none")){
+                                values.put("gameCode",gameCode);
+                                values.put("portalRange",numberOfPlayers);
+                                values.put("GameState","lost");
+                                values.put("Amount",Amount);
 
-                               long row =  db.insert("records",null,values);
-                               if (row != 0){
-                                   clearPortal(userID);
-                                   Toast.makeText(getApplicationContext(),"saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
-                               }else{
-                                   Toast.makeText(getApplicationContext(),"Error occurred while saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
-                               }
+                                long row =  db.insert("records",null,values);
+                                if (row != 0){
+                                    //clearPortal(userID);
+                                    Toast.makeText(getApplicationContext(),"saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(getApplicationContext(),"Error occurred while saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
+                                }
 
-                           }else{
-                               values.put("gameCode",gameCode);
-                               values.put("portalRange",numberOfPlayers);
-                               values.put("GameState",numberOfPlayers);
-                               values.put("Amount",Amount);
+                            }else{
+                                values.put("gameCode",gameCode);
+                                values.put("portalRange",numberOfPlayers);
+                                values.put("GameState",numberOfPlayers);
+                                values.put("Amount",Amount);
 
-                               long row =  db.insert("records",null,values);
-                               if (row != 0){
-                                   clearPortal(userID);
-                                   Toast.makeText(getApplicationContext(),"saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
-                               }else{
-                                   Toast.makeText(getApplicationContext(),"Error occurred while saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
-                               }
-                           }
-                       }
-                   }
-               });
+                                long row =  db.insert("records",null,values);
+                                if (row != 0){
+                                    //clearPortal(userID);
+                                    Toast.makeText(getApplicationContext(),"saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(getApplicationContext(),"Error occurred while saving records in SQL db !!!", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+
+                        }
+                    }
+                });
             }
         });
     }
@@ -485,109 +470,30 @@ public class Activity4 extends AppCompatActivity {
     public void enterArenas(){
         Intent intent = new Intent(Activity4.this,LandingActivity.class);
         startActivity(intent);
-        finish();
-    }
 
-    //Background operation
-    public void playGameVisible(String userID){
-        Handler handler;
-        handler = new Handler();
+    } //new
 
-        Runnable checkVisibility = new Runnable() {
+    public void playGameVisible(){
+
+        GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void run() {
-                GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            int readyParticipant = task.getResult().size();
-
-                            GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()){
-                                        int numberOfWinners = task.getResult().size();
-
-                                        GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                                                if(task.isSuccessful()){
-                                                    DocumentSnapshot document = task.getResult();
-
-                                                    if (document.exists()){
-                                                        String permission = valueOf(document.get("Permission"));
-
-                                                        if (permission.equals("A")){
-
-                                                            playGame.setVisibility(View.VISIBLE);
-
-                                                        }else if (readyParticipant == 5 && numberOfWinners >= 1){
-                                                            playGame.setVisibility(View.VISIBLE);
-                                                        }else {
-                                                            playGame.setVisibility(View.GONE);
-                                                        }
-
-                                                    }else{
-                                                        Toast.makeText(getApplicationContext(),"document does not exists", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }else {
-                                                    Toast.makeText(getApplicationContext(),"retrieving results didn't occur ", Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                        });
-                                    }else{
-                                        Toast.makeText(getApplicationContext(),"winners not available, something went wrong ", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
-                        }else {
-                            Intent intent = new Intent(Activity4.this,Activity2.class);
-                            startActivity(intent);
-                            Toast.makeText(getApplicationContext(),"Something went wrong !!!", Toast.LENGTH_SHORT).show();
-                        }
+            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    int readyParticipant = task.getResult().size();
+                    if (readyParticipant == 5){
+                        playGame.setVisibility(View.VISIBLE);
+                    }else {
+                        playGame.setVisibility(View.GONE);
                     }
-                });
-
-                handler.postDelayed(this,5000);
+                }else {
+                    Intent intent = new Intent(Activity4.this,Activity2.class);
+                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(),"Something went wrong !!!", Toast.LENGTH_SHORT).show();
+                }
             }
-        };
-        handler.post(checkVisibility);
+        });
+    } //new
 
-    }
 
-    //Background operation
-    public void autoSelectWinnersOnIdeal(String userID){
-        Handler handler;
-        handler = new Handler();
-
-        Runnable autoSelectOnIdeal = new Runnable() {
-            @Override
-            public void run() {
-
-                GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()){
-                                String permission = valueOf(document.get("Permission"));
-
-                                if (permission.equals("A")){
-                                    //SelectWinners(userID);
-                                    //systemCalculations(userID);
-                                }
-
-                            }else {
-                                Toast.makeText(getApplicationContext()," Document does not exist !!!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                });
-                handler.postDelayed(this,60000*5);
-            }
-        };
-        handler.post(autoSelectOnIdeal);
-    }
 
 }

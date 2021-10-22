@@ -8,11 +8,7 @@
     tools:context=".Activity5"
     android:orientation="vertical">
 
-   <androidx.recyclerview.widget.RecyclerView
-       android:id="@+id/rv_Sqlite_Programs"
-       android:paddingTop="20sp"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent" />
+
     <TextView
        android:id="@+id/displayDataRecordsInfo"
        android:layout_width="422dp"
@@ -23,5 +19,9 @@
        android:textAlignment="center"
        android:textColor="#F44336"
        android:textSize="14dp" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

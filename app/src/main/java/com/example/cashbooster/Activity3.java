@@ -29,7 +29,7 @@ public class Activity3 extends AppCompatActivity {
 
         Activity3button = findViewById(R.id.Activity3button);
         userName3 = findViewById(R.id.userName3);
-        editTextPhone = findViewById(R.id.editTextPhone);
+        //editTextPhone = findViewById(R.id.editTextPhone);
         passwordActivity3 = findViewById(R.id.passwordActivity3);
         passwordActivity3Confirm = findViewById(R.id.passwordActivity3Confirm);
         mFirebaseAuth = FirebaseAuth.getInstance();

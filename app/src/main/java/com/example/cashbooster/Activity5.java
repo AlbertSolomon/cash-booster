@@ -19,13 +19,13 @@ public class Activity5 extends AppCompatActivity {
         setContentView(R.layout.activity_5);
 
         displayDataRecordsInfo = findViewById(R.id.displayDataRecordsInfo);
-        rv_Sqlite_Programs = findViewById(R.id.rv_Sqlite_Programs);
+        //rv_Sqlite_Programs = findViewById(R.id.rv_Sqlite_Programs);
 
         myCashBoosterRecords dbHelper = new myCashBoosterRecords(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String myRecords[] = {"gameCode","portalRange","GameState","Amount"};
-        Cursor myCursor = db.query("records",myRecords,"*",null,null,null,null);
+        Cursor myCursor = db.query("records",myRecords,null,null,null,null,null);
         myCursor.moveToNext();
 
        // displayDataRecordsInfo.setText("This feature is coming soon!!! ");
