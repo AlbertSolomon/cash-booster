@@ -12,15 +12,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CashBooster">
-        <activity android:name=".LandingActivity"></activity>
+        <activity android:name=".LandingActivity" android:screenOrientation="portrait"></activity>
         <!-- android:usesCleartextTraffic="true" -->
-        <activity android:name=".Activity5" />
-        <activity android:name=".Activity4" />
-        <activity android:name=".Activity3" />
-        <activity android:name=".Activity2" />
+        <activity android:name=".Activity5" android:screenOrientation="portrait"/>
+        <activity android:name=".Activity4" android:screenOrientation="portrait"/>
+        <activity android:name=".Activity3" android:screenOrientation="portrait"/>
+        <activity android:name=".Activity2" android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

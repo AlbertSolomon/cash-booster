@@ -2,6 +2,7 @@ package com.example.cashbooster;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Objects;
+
 public class Activity3 extends AppCompatActivity {
 
     Button Activity3button;
@@ -26,6 +29,8 @@ public class Activity3 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_3);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        //android:screenOrientation="portrait" to added as an attribute in this activity in manifest
 
         Activity3button = findViewById(R.id.Activity3button);
         userName3 = findViewById(R.id.userName3);

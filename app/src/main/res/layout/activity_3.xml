@@ -19,8 +19,8 @@
 
     <View
         android:id="@+id/view3"
-        android:layout_width="739dp"
-        android:layout_height="154dp"
+        android:layout_width="788dp"
+        android:layout_height="163dp"
         android:background="@drawable/ic_bottomwave"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,11 +40,11 @@
         android:textColorHint="@color/text_hint"
         android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/passwordActivity3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/textView3"
+        app:layout_constraintHorizontal_bias="0.521"
+        app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:layout_constraintVertical_bias="0.844" />
+        app:layout_constraintVertical_bias="0.747" />
 
     <EditText
         android:id="@+id/passwordActivity3"
@@ -61,16 +61,15 @@
         android:textColorHint="@color/text_hint"
         android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/passwordActivity3Confirm"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/userName3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/userName3" />
 
     <EditText
         android:id="@+id/passwordActivity3Confirm"
         android:layout_width="384dp"
         android:layout_height="56dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="52dp"
         android:background="@drawable/rounded_edit_text"
         android:ems="10"
         android:hint="Confirm Password"
@@ -81,12 +80,15 @@
         android:textColorHint="@color/text_hint"
         android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/Activity3button"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/passwordActivity3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/passwordActivity3" />
 
     <Button
         android:id="@+id/Activity3button"
         android:layout_width="207dp"
         android:layout_height="53dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_corner_solid_btn"
         android:gravity="center"
         android:text="@string/Sign_up"
@@ -94,14 +96,15 @@
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/view3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/passwordActivity3Confirm"
+        app:layout_constraintHorizontal_bias="0.485"
+        app:layout_constraintStart_toStartOf="@+id/passwordActivity3Confirm" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="194dp"
         android:layout_height="60dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="52dp"
         android:gravity="center"
         android:text="@string/Sign_up"
         android:textAlignment="center"
@@ -109,7 +112,7 @@
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintHorizontal_bias="0.543"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/view5" />
 

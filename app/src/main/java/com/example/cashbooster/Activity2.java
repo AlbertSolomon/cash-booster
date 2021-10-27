@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +51,7 @@ public class Activity2 extends AppCompatActivity {
     int gameRange;
     int luckyNumber;
     String permission, GameState, GameStart, AccountsCollectionName;
-    boolean natureOfPortal;
+    boolean portalPlayed, gameAccess,resourcePermission,isFull;
 
     {
         AccountsCollectionName = "Accounts";
@@ -205,54 +206,60 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameRange = 2000;
-                //String collectionName = "GamePortal2k";
 
-                //collection reference for a specific card portal(game amount) password: cashbooster000
-                //CollectionReference GamePortals = db.collection(collectionName);
-
-                /*GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
+                        if(task.isSuccessful()){
                             int numberOfPlayers = task.getResult().size();
 
-                            if (numberOfPlayers == 5){
+                            db.collection(collectionName).document(currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()){
+                                        DocumentSnapshot document = task.getResult();
+                                        if(document.exists()){
+                                            openActivity4(currentUser);
+                                        }else {
+                                            if (numberOfPlayers == 0){
+                                                permission = "A";
 
-                                Toast.makeText(getApplicationContext(),"Sorry the portal is full!!!", Toast.LENGTH_LONG).show();
+                                                insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
+                                                openActivity4(currentUser);
 
-                            }else {
-                                insertingAndCreatingPortals(collectionName,currentUser);
-                                //passing values to next activity
-                                Intent intent = new Intent(Activity2.this, Activity4.class);
-                                //intent.putExtra("gameRange",gameRange);
-                                intent.putExtra("collectionName",collectionName);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                    }
-                });*/
+                                            }else if (numberOfPlayers <5){
+                                                permission = "F";
+                                                /*new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        try {
+                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
+                                                            Thread.sleep(500);
+                                                            openActivity4(currentUser);
 
+                                                        }catch (Exception e){
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+                                                });*/
 
-                GamePortals.whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            int participants = task.getResult().size();
-                            //if (participants >= 1){
-                            // goToActivity4.setVisibility(View.GONE);
-                            // }else{
+                                                insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
+                                                openActivity4(currentUser);
 
-                                openActivity4(currentUser);
-                            Toast.makeText(getApplicationContext()," Getting set ", Toast.LENGTH_SHORT).show();
-                            //}
+                                            }else {
+                                                Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }else{
+                                        task.getException();
+                                    }
+                                }
+                            });
                         }else{
-
-                            Toast.makeText(getApplicationContext()," Task does not exists !!!", Toast.LENGTH_SHORT).show();
+                            task.getException();
                         }
                     }
                 });
-
 
             }
         });
@@ -328,13 +335,99 @@ public class Activity2 extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String string){
-            super.onPostExecute(string);
+        protected String doInBackground(String... strings) {
+            //join portal
+            //if portal game has been played and if game game portal is full (dont allow new users to join)
+            //else join portal
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        db.collection(collectionName).whereArrayContains("GameState", "Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()){
+                                    int numberOfWinners = task.getResult().size();
+
+                                    if (numberOfWinners == 0){
+                                        portalPlayed = false;
+                                    }else {
+                                        portalPlayed = true;
+                                    }
+                                }else{
+                                    task.getException();
+                                }
+                            }
+                        });
+                        Thread.sleep(1000);
+                        db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+
+                                    int numberOfDocuments = task.getResult().size();
+
+                                    if (numberOfDocuments == 0){
+                                        resourcePermission = true;
+
+                                    }else if(numberOfDocuments < 5){
+                                        resourcePermission = false;
+
+                                    }else{
+                                        //Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
+                                        //isFull = true;
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(),"Could not count the number of documents in GamePortals", Toast.LENGTH_SHORT).show();
+                                    task.getException();
+                                }
+
+                            }
+                        });
+                        Thread.sleep(1000);
+                        db.collection(collectionName).document(String.valueOf(strings)).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                gameAccess = true;
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull @NotNull Exception e) {
+                                gameAccess = false;
+                            }
+                        });
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return null;
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            return null;
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(String string){
+            super.onPostExecute(string);
+            if (gameAccess && portalPlayed){
+                //go activity4
+                Toast.makeText(getApplicationContext(),"gone to activity 4", Toast.LENGTH_SHORT).show();
+            }else if(resourcePermission){
+                permission = "A";
+                //go activity4
+                Toast.makeText(getApplicationContext(),"gone to activity 4", Toast.LENGTH_SHORT).show();
+            }else if (resourcePermission = false){
+                permission = "F";
+                //go activity4
+                Toast.makeText(getApplicationContext(),"gone to activity 4", Toast.LENGTH_SHORT).show();
+            }else if(isFull){
+                Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
