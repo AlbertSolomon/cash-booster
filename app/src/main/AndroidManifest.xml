@@ -3,6 +3,7 @@
     package="com.example.cashbooster">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name="androidx.multidex.MultiDexApplication"
@@ -12,12 +13,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CashBooster">
-        <activity android:name=".LandingActivity" android:screenOrientation="portrait"></activity>
-        <!-- android:usesCleartextTraffic="true" -->
-        <activity android:name=".Activity5" android:screenOrientation="portrait"/>
-        <activity android:name=".Activity4" android:screenOrientation="portrait"/>
-        <activity android:name=".Activity3" android:screenOrientation="portrait"/>
-        <activity android:name=".Activity2" android:screenOrientation="portrait" />
+        <activity android:name=".ThreeToWin"></activity>
+        <activity
+            android:name=".LandingActivity"
+            android:screenOrientation="portrait" /> <!-- android:usesCleartextTraffic="true" -->
+        <activity
+            android:name=".Activity5"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity4"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity3"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity2"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

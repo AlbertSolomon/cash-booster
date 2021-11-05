@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     openNextActivity(username, password);
+                    //execute service, to keep users logged in
                 }
             }
         });

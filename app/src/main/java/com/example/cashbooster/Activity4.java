@@ -6,9 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -46,21 +52,37 @@ public class Activity4 extends AppCompatActivity {
     String collectionName;
     String AccountsCollectionName = "Accounts";
     String chosenOnes = "TheChosenOnes";
-    boolean natureOfAdmin;
+    String Loser = "Loser";
+    boolean natureOfAdmin,threeToWinIs;
     int myCode;
+    int numberOfLosers = 1;
+    int numberSp;
 
     FirebaseFirestore db;
     {
         db = FirebaseFirestore.getInstance();
-        collectionName = "GamePortals";
-        GamePortals = db.collection(collectionName);
         Accounts = db.collection(AccountsCollectionName);
     }
+
+    Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_4);
+
+        SharedPreferences testSp = getApplicationContext().getSharedPreferences("gameCollections", Context.MODE_PRIVATE);
+        collectionName = testSp.getString("collectionName","");
+        numberOfLosers = testSp.getInt("numberOfLosers",numberSp);
+        Toast.makeText(getApplicationContext(), String.format("# of loser is%d", numberOfLosers), Toast.LENGTH_LONG).show();
+
+        if (numberOfLosers == 2){
+            threeToWinIs = true;
+        }else {
+            threeToWinIs = false;
+        }
+
+        GamePortals = db.collection(collectionName);
 
         displayData = findViewById(R.id.displayData);
         playGame = findViewById(R.id.playGame);
@@ -72,14 +94,15 @@ public class Activity4 extends AppCompatActivity {
         String currentUser;
         {
             currentUser = mFirebaseAuth.getCurrentUser().getUid();
-            //CurrentUserDocument = db.document(currentUser);
         }
+
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         getAccountBalance(currentUser);
         getGameCode(currentUser);
         playGameVisible(); //new
 
-        /**GamePortals.document(currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        GamePortals.document(currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
@@ -98,7 +121,7 @@ public class Activity4 extends AppCompatActivity {
                             //Making user that all users are ready before Processing and retrieving information
                             //This is where i call a recycler view.
 
-                            //Making user that all users are ready before retrieving information
+                            //Making user that all users are ready before retrieving information**/
                         }else if(AdministratorRPermission.equals("F")){
                             //displayResults(currentUser);
                             //enterArenas();
@@ -108,33 +131,33 @@ public class Activity4 extends AppCompatActivity {
                     }
                 }
             }
-        });**/
+        });
 
         playGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                SelectWinners(currentUser);
+                //SelectWinners(currentUser);
                 //SelectWinnersVersion2(currentUser);
                 //displayResults(currentUser);
-                /*try {
-                    Thread.sleep(10000);
+                try {
+                    //Thread.sleep(10000);
                     if (natureOfAdmin){
                         SelectWinners(currentUser);
-                        updateSystemAccount(currentUser);
+                        //updateSystemAccount(currentUser);
+                        updateSystemAccountV2(currentUser);
                     }else{
                         displayResults(currentUser);
                     }
                 }catch (Exception e){
                     e.printStackTrace();
-                }*/
+                }
             }
         });
     }
 
     public void SelectWinners(String userID){
 
-        GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()){
@@ -154,83 +177,178 @@ public class Activity4 extends AppCompatActivity {
                     ArrayList<Integer> gameWinners;
                     gameWinners = new ArrayList<>();
 
-                    //displayData.setText(valueOf(numberPot.get(random.nextInt(numberPot.size()))));
-                   /* for(int i= 0; i< numberPot.size() - 1; i++){
+                    if (threeToWinIs){
+                        int lucky3 = 3;
 
-                        boolean toGameWinners,gameLoser;
-                        toGameWinners = gameWinners.add(numberPot.get(random.nextInt(numberPot.size())));
-                        gameLoser = numberPot.remove(numberPot.get(random.nextInt(numberPot.size())));
+                        for(int i= 0; i< numberPot.size()-1; i++){
+                            int randomIndex = random.nextInt(numberPot.size());
+                            boolean toGameWinners,gameLoser;
 
-                        if(toGameWinners == gameLoser){
-                            gameWinners.add(numberPot.get(random.nextInt(numberPot.size())));
-                            numberPot.remove(numberPot.get(random.nextInt(numberPot.size())));
+                            toGameWinners=gameWinners.add(numberPot.get(randomIndex));
+                            gameLoser= numberPot.remove(numberPot.get(randomIndex));
+
+                            if(toGameWinners == gameLoser){
+                                gameWinners.add(numberPot.get(randomIndex));
+                                numberPot.remove(numberPot.get(randomIndex));
+                            }
+                        }
+                        /*if(gameWinners.size() == 4){
+                            gameWinners.remove(gameWinners.get(randomIndex));
+                            numberPot.add(gameWinners.get(randomIndex));
+                        }*/
+
+                        int unLuckyGuy = random.nextInt(numberPot.size());
+
+                        if(gameWinners.size() == 4){
+                            gameWinners.remove(gameWinners.get(unLuckyGuy));
+                            numberPot.add(gameWinners.get(unLuckyGuy));
                         }
 
-                        //System.out.println("This a code for a loser!"+ numberPot);
+                        //displayData.setText(valueOf(gameWinners.size()));
+                        //displayData.setText(valueOf(numberPot.size()));
 
-                    }*/
+                        Map<String, Object> gameWinner = new HashMap<>();
+                        gameWinner.put("ChosenCode0" ,gameWinners.get(0));
+                        gameWinner.put("ChosenCode1" ,gameWinners.get(1));
+                        gameWinner.put("ChosenCode2" ,gameWinners.get(2));
 
-                    for(int i= 0; i< numberPot.size() - 1; i++){
-                        int randomIndex = random.nextInt(numberPot.size());
-                        boolean toGameWinners,gameLoser;
+                        db.collection(collectionName).document(chosenOnes).set(gameWinner).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Toast.makeText(getApplicationContext(),"code updated", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull @NotNull Exception e) {
+                                Toast.makeText(getApplicationContext(),"writing data failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
-                        //toGameWinners=gameWinners.add(numberPot.get(random.nextInt(numberPot.size())));
-                        //gameLoser= numberPot.remove(numberPot.get(random.nextInt(numberPot.size())));
+                       // for(int winnerCounter = 0; winnerCounter < lucky3; winnerCounter++){}
 
-                        toGameWinners=gameWinners.add(numberPot.get(randomIndex));
-                        gameLoser= numberPot.remove(numberPot.get(randomIndex));
+                        /*for(int counter = 0; counter < gameWinners.size()-1; counter++){
+                            db.collection(collectionName).whereEqualTo("GameCode", gameWinners.get(counter)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        for(QueryDocumentSnapshot document: task.getResult()){
+                                            if (gameWinners.size() <= 3){
 
-                        if(toGameWinners == gameLoser){
-                            gameWinners.add(numberPot.get(randomIndex));
-                            numberPot.remove(numberPot.get(randomIndex));
+                                                //Map<String, Object> updateWinner = new HashMap<>();
+                                               // updateWinner.put("GameState","Winner");
+                                                //GamePortals.document(document.getId()).update(updateWinner);
+                                                Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_LONG).show();
+                                                //System.out.println(gameWinners);
+
+
+
+                                             }
+                                        }
+
+                                    }else {
+                                        Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         }
-                    }
-                    for(int counter = 1; counter < 5; counter++){
-                        db.collection(collectionName).whereEqualTo("GameCode", gameWinners.get(counter -1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                        /*for (int loserCounter = 0; loserCounter < numberOfLosers; loserCounter++){
+                            db.collection(collectionName).whereEqualTo("GameCode",numberPot.get(loserCounter)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        for (QueryDocumentSnapshot document: task.getResult()){
+                                            Map<String, Object> updateLoser = new HashMap<>();
+                                            updateLoser.put("GameState",Loser);
+                                            GamePortals.document(document.getId()).update(updateLoser);
+                                            Toast.makeText(getApplicationContext(),"Losers updated", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }else{
+                                        task.getException();
+                                    }
+                                }
+                            });
+                        }*/
+
+
+                        //displayData.setText(valueOf(gameWinners.get(1)));
+                        //displayData.setText(valueOf(numberPot.size()));
+                        //displayData.setText(valueOf(gameWinners.size()));
+                        /*try{
+
+                            Thread.sleep(500);
+                            displayResults(userID);
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }*/
+
+                    }else {
+
+                        for(int i= 0; i< numberPot.size() - 1; i++){
+                            int randomIndex = random.nextInt(numberPot.size());
+                            boolean toGameWinners,gameLoser;
+
+                            toGameWinners=gameWinners.add(numberPot.get(randomIndex));
+                            gameLoser= numberPot.remove(numberPot.get(randomIndex));
+
+                            if(toGameWinners == gameLoser){
+                                gameWinners.add(numberPot.get(randomIndex));
+                                numberPot.remove(numberPot.get(randomIndex));
+                            }
+                        }
+                        for(int counter = 1; counter < 5; counter++){
+                            db.collection(collectionName).whereEqualTo("GameCode", gameWinners.get(counter -1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        for(QueryDocumentSnapshot document: task.getResult()){
+                                            if (gameWinners.size() <= 4){
+
+                                                Map<String, Object> updateWinner = new HashMap<>();
+                                                updateWinner.put("GameState","Winner");
+                                                GamePortals.document(document.getId()).update(updateWinner);
+                                                Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_SHORT).show();
+                                                //System.out.println(gameWinners);
+
+                                            }
+                                        }
+
+                                    }else {
+                                        Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+
+                        db.collection(collectionName).whereEqualTo("GameCode",numberPot.get(0)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                                 if(task.isSuccessful()){
-                                    for(QueryDocumentSnapshot document: task.getResult()){
-                                        if (gameWinners.size() <= 4){
-
-                                            Map<String, Object> updateWinner = new HashMap<>();
-                                            updateWinner.put("GameState","Winner");
-                                            GamePortals.document(document.getId()).update(updateWinner);
-                                            Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_SHORT).show();
-                                            //System.out.println(gameWinners);
-
-                                        }
+                                    for (QueryDocumentSnapshot document: task.getResult()){
+                                        Map<String, Object> updateLoser = new HashMap<>();
+                                        updateLoser.put("GameState",Loser);
+                                        GamePortals.document(document.getId()).update(updateLoser);
+                                        Toast.makeText(getApplicationContext(),"Loser updated", Toast.LENGTH_SHORT).show();
                                     }
-
-                                }else {
-                                    Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    task.getException();
                                 }
                             }
                         });
-                    }
 
-                    db.collection(collectionName).whereEqualTo("GameCode",numberPot.get(0)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                            if(task.isSuccessful()){
-                                for (QueryDocumentSnapshot document: task.getResult()){
-                                    Map<String, Object> updateWinner = new HashMap<>();
-                                    updateWinner.put("GameState","Loser");
-                                    GamePortals.document(document.getId()).update(updateWinner);
-                                    Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_SHORT).show();
-                                }
-                            }else{
-                                task.getException();
-                            }
+                        //displayData.setText(valueOf(gameWinners.get(1)));
+                        //displayData.setText(valueOf(numberPot.size()));
+                        //displayData.setText(valueOf(gameWinners.size()));
+                        try{
+
+                            Thread.sleep(500);
+                            displayResults(userID);
+
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
-                    });
-
-                    //displayData.setText(valueOf(gameWinners.get(1)));
-                    //displayData.setText(valueOf(numberPot.size()));
-                    //displayData.setText(valueOf(gameWinners.size()));
-                    displayResults(userID);
-
-
+                    }
                 }else{
                     Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
                 }
@@ -255,6 +373,11 @@ public class Activity4 extends AppCompatActivity {
                             displayData.setText("Loser !!!");
                         }else{
                             displayData.setText(valueOf(document.get("GameState")));
+                            if (Build.VERSION.SDK_INT >= 26){
+                                vibrator.vibrate(VibrationEffect.createOneShot(1500, VibrationEffect.DEFAULT_AMPLITUDE));
+                            }else{
+                                vibrator.vibrate(100);
+                            }
                         }
                         //doing some calculations
                         systemCalculations(userID);
@@ -268,7 +391,7 @@ public class Activity4 extends AppCompatActivity {
     }
 
     public void systemCalculations(String userID){
-        GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection(collectionName).document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
@@ -282,21 +405,34 @@ public class Activity4 extends AppCompatActivity {
                                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                                     DocumentSnapshot AccountsDocument = task.getResult();
                                     double balance = Double.parseDouble(valueOf(AccountsDocument.get("AmountBalance")));
-                                    Toast.makeText(getApplicationContext()," AccountBalance:"+balance, Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getApplicationContext()," AccountBalance:"+balance, Toast.LENGTH_SHORT).show();
 
-                                    double AmountWon = UserAmount * 0.25;
-                                    double total = balance + AmountWon;
+                                    if(threeToWinIs){
+                                        double AmountWon = UserAmount * 0.25;
+                                        double total = balance + AmountWon;
 
-                                    Map<String, Object> updateTotal = new HashMap<>();
-                                    updateTotal.put("AmountBalance",total);
-                                    Accounts.document(userID).update(updateTotal);
+                                        Map<String, Object> updateTotal = new HashMap<>();
+                                        updateTotal.put("AmountBalance",total);
+                                        Accounts.document(userID).update(updateTotal);
 
-                                    //Storing and deleting records
-                                    //storeRecords(userID);
+                                        //Storing and deleting records
+                                        //storeRecords(userID);
+                                    }else {
+                                        double AmountWon = UserAmount * 0.2;
+                                        double total = balance + AmountWon;
+
+                                        Map<String, Object> updateTotal = new HashMap<>();
+                                        updateTotal.put("AmountBalance",total);
+                                        Accounts.document(userID).update(updateTotal);
+
+                                        //Storing and deleting records
+                                        //storeRecords(userID);
+                                    }
+
                                 }
                             });
                         }
-                        else if(GameDocument.get("GameState").equals("none")){
+                        else if(GameDocument.get("GameState").equals(Loser)){
                             Accounts.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
@@ -324,7 +460,7 @@ public class Activity4 extends AppCompatActivity {
         });
     }
     public void updateSystemAccount(String userID){
-        db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 //Check if user balance is qualified for a particular game portal.
@@ -332,7 +468,7 @@ public class Activity4 extends AppCompatActivity {
                     //Log.d("TAG", task.getResult().size() + "");
                     int numberOfDocuments = task.getResult().size();
 
-                    GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    db.collection(collectionName).document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                             DocumentSnapshot document = task.getResult();
@@ -356,6 +492,72 @@ public class Activity4 extends AppCompatActivity {
                                                     Map<String, Object> updateTotal = new HashMap<>();
                                                     updateTotal.put("AmountBalance",total);
                                                     Accounts.document("systemAccount").update(updateTotal);
+                                                }else{
+                                                    Toast.makeText(getApplicationContext(),"System Account, user population does meet specifies requirements.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }else{
+                                                Toast.makeText(getApplicationContext(),"System Document does not exist", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                        }else{
+                                            Toast.makeText(getApplicationContext(),"System's Account encountered an error !", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }else {
+                                Toast.makeText(getApplicationContext(),"error, something went wrong ", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+                    //Log.d(TAG, "Error getting documents: ", task.getException());
+                    Toast.makeText(getApplicationContext(),"System Account was not updated", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    public void updateSystemAccountV2(String userID){
+        db.collection(collectionName).whereEqualTo("GameState","Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                //Check if user balance is qualified for a particular game portal.
+                if (task.isSuccessful()) {
+                    //Log.d("TAG", task.getResult().size() + "");
+                    int numberOfDocuments = task.getResult().size();
+
+                    db.collection(collectionName).document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                            DocumentSnapshot document = task.getResult();
+
+                            if (document.exists()){
+
+                                double UserAmount  = Double.parseDouble(valueOf(document.get("Amount")));
+                                Accounts.document("systemAccount").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()){
+                                            DocumentSnapshot systemDocument = task.getResult();
+
+                                            if (systemDocument.exists()){
+                                                double systemBalance = Double.parseDouble(valueOf(systemDocument.get("AmountBalance")));
+
+                                                if (numberOfDocuments == 4){
+                                                    double AmountWon = UserAmount * 0.2;
+                                                    double total = systemBalance + AmountWon;
+
+                                                    Map<String, Object> updateTotal = new HashMap<>();
+                                                    updateTotal.put("AmountBalance",total);
+                                                    Accounts.document("systemAccount").update(updateTotal);
+                                                }else if (numberOfDocuments == 3){
+                                                    double AmountWon = UserAmount * 0.25;
+                                                    double total = systemBalance + AmountWon;
+
+                                                    Map<String, Object> updateTotal = new HashMap<>();
+                                                    updateTotal.put("AmountBalance",total);
+                                                    Accounts.document("systemAccount2").update(updateTotal);
+
                                                 }else{
                                                     Toast.makeText(getApplicationContext(),"System Account, user population does meet specifies requirements.", Toast.LENGTH_SHORT).show();
                                                 }
@@ -454,28 +656,50 @@ public class Activity4 extends AppCompatActivity {
 
     }
 
-    public void getAccountBalance(String UserID){
-        Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    DocumentSnapshot document = task.getResult();
-                    if(document.exists()){
-                        displayBalance.setText(valueOf(document.get("AmountBalance")));
-                    }else {
-                        displayBalance.setText("N/A");
-                        Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
-                    }
 
-                }else{
-                    Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
-                }
+//Background Operation
+    public void getAccountBalance(String UserID){
+        //Realtime updates.
+
+        Handler handler;
+        handler = new Handler();
+
+        Runnable getAccountBalance = new Runnable(){
+
+            @Override
+            public void run() {
+                Accounts.document(UserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+
+                            Runnable iteratedCheck = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(document.exists()){
+                                        displayBalance.setText(valueOf(document.get("AmountBalance")));
+                                    }else {
+                                        displayBalance.setText("N/A");
+                                        handler.postDelayed(this,5000);
+                                        Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            };
+                            handler.post(iteratedCheck);
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
-        });
+        };
+        Thread accountBalance = new Thread(getAccountBalance);
+        accountBalance.start();
     }
 
     public void getGameCode(String userID){
-        GamePortals.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection(collectionName).document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
@@ -501,7 +725,7 @@ public class Activity4 extends AppCompatActivity {
 
     public void playGameVisible(){
 
-        GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(collectionName).whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()){
@@ -520,8 +744,7 @@ public class Activity4 extends AppCompatActivity {
         });
     } //new
 
-
-    public void SelectWinnersVersion2(String userID){
+   /* public void SelectWinnersVersion2(String userID){
 
         GamePortals.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -590,6 +813,6 @@ public class Activity4 extends AppCompatActivity {
                 }
             }
         });
-    }
+    }*/
 
 }

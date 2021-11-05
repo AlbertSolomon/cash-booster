@@ -1,5 +1,9 @@
 package com.example.cashbooster;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,19 +12,12 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,15 +26,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class Activity2 extends AppCompatActivity {
-
+public class ThreeToWin extends AppCompatActivity {
     CardView card2k,card5k,card10k,card20k,card50k,card100k;
 
     FirebaseAnalytics TestFirebaseAnalytics;
@@ -54,7 +49,7 @@ public class Activity2 extends AppCompatActivity {
     String permission, GameState, GameStart, AccountsCollectionName;
     boolean gamePlayed, gameAccess,resourcePermission,isFull,fourOfFour;
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String currentTime = simpleDateFormat.format(new Date());
 
     double AccountBalance;
@@ -70,15 +65,27 @@ public class Activity2 extends AppCompatActivity {
         Accounts = db.collection(AccountsCollectionName);
     }
 
-    Integer requiredLosers = 1;
+
+    SharedPreferences Winner3sp;
+    Integer requiredLosers = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_2);
+        setContentView(R.layout.activity_three_to_win);
         FirebaseApp.initializeApp(this);
 
         collectionNameSp = getSharedPreferences("gameCollections", Context.MODE_PRIVATE);
+        //SharedPreferences.Editor editor = collectionNameSp.edit();
+        //editor.putString("collectionName",collectionName);
+        //editor.putInt("numberOfLosers",requiredLosers);
+        //editor.commit();
+
+       // Winner3sp = getSharedPreferences("ThreeWinners", Context.MODE_PRIVATE);
+        //inside the cards
+        //SharedPreferences.Editor editor = Winner3sp .edit();
+        //editor.putInt("numberOfLosers",requiredLosers);
+        //editor.commit();
 
         //CardView Declarations test
         card2k = findViewById(R.id.card2k);
@@ -91,6 +98,8 @@ public class Activity2 extends AppCompatActivity {
         TestFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         String currentUser = mFirebaseAuth.getCurrentUser().getUid();
+
+
 
         getAccountBalance(currentUser);
         AccountCollection(currentUser,gameRange);
@@ -106,12 +115,12 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameRange = 2000;
-                collectionName = "GamePortals";
+                collectionName = "GamePortals3toWin";
                 playedGameRestriction(collectionName);
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -184,11 +193,11 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameRange = 5000;
-                String collectionName = "GamePortal5k";
+                String collectionName = "GamePortal5k3toWin";
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -261,12 +270,12 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameRange = 10000;
-                String collectionName = "GamePortal10k";
+                String collectionName = "GamePortal10k3toWin";
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
-                editor.commit();
+                editor.putInt("numberOfLosers",requiredLosers);
+                editor.apply();
 
                 if (AccountBalance < gameRange){
 
@@ -338,11 +347,11 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameRange = 20000;
-                String collectionName = "GamePortal20k";
+                String collectionName = "GamePortal20k3toWin";
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -419,7 +428,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -496,7 +505,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -564,7 +573,6 @@ public class Activity2 extends AppCompatActivity {
             }
         });
     }
-
     //################################################## ASYNC TASK (CLASS DECLARATION) #####################################################
     /*
     public class JoiningPortals extends AsyncTask<String,String,String>{
@@ -676,7 +684,7 @@ public class Activity2 extends AppCompatActivity {
         Runnable insertDataDocuments = new Runnable() {
             @Override
             public void run() {
-                Map<String, Object>gamePortal = new HashMap<>();
+                Map<String, Object> gamePortal = new HashMap<>();
                 gamePortal.put("UserID",UserID);
                 gamePortal.put("Permission",permission);
                 gamePortal.put("Amount",Amount);
@@ -729,7 +737,7 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onSuccess(Void unused) {
                 Toast.makeText(getApplicationContext(),"user is Ready !!!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Activity2.this, Activity4.class);
+                Intent intent = new Intent(ThreeToWin.this, Activity4.class);
                 startActivity(intent);
                 finish();
             }
@@ -801,7 +809,7 @@ public class Activity2 extends AppCompatActivity {
                                     if(document.exists()){
                                         //CashBalanceDisplay.setText(String.valueOf(document.get("AmountBalance")));
                                     }else {
-                                       // CashBalanceDisplay.setText("N/A");
+                                        // CashBalanceDisplay.setText("N/A");
                                         handler.postDelayed(this,5000);
                                         Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
                                     }
@@ -821,7 +829,7 @@ public class Activity2 extends AppCompatActivity {
     }
 
     public void getTheRecords(){
-        Intent intent = new Intent(Activity2.this, Activity5.class);
+        Intent intent = new Intent(ThreeToWin.this, Activity5.class);
         startActivity(intent);
     }
 
@@ -903,7 +911,7 @@ public class Activity2 extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     if(noReadyParticipants == 5){
-                                        Intent intent = new Intent(Activity2.this, Activity4.class);
+                                        Intent intent = new Intent(ThreeToWin.this, Activity4.class);
                                         startActivity(intent);
                                         finish();
 

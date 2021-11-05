@@ -1,7 +1,9 @@
 package com.example.cashbooster;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ public class cashBoosterService extends Service {
     String userID,gameResult,ready,collectionName;
     Integer gameAmount,gameCode;
 
+
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     @Nullable
     @Override
@@ -34,6 +37,10 @@ public class cashBoosterService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        SharedPreferences testSp = getApplicationContext().getSharedPreferences("gameCollections", Context.MODE_PRIVATE);
+        collectionName = testSp.getString("collectionName","");
+
         db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
@@ -71,6 +78,7 @@ public class cashBoosterService extends Service {
                         }
 
                         //Send Json Array to server 000webHost (CashBooster API site)
+
                         
                     }
                 }
