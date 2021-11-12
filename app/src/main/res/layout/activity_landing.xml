@@ -11,14 +11,14 @@
         android:id="@+id/textView6"
         android:layout_width="243dp"
         android:layout_height="82dp"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="76dp"
         android:gravity="center"
         android:text="CHOOSE GAME"
         android:textAlignment="center"
         android:textSize="25dp"
+        android:textColor="@color/black"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.42"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

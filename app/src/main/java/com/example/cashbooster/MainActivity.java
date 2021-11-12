@@ -1,11 +1,14 @@
 package com.example.cashbooster;
 
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,9 +24,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loginButton, signupButton;
-    EditText PasswordText, userName;
 
+    String PasswordText, userEmail;
+    Integer loginValue = 0;
+    ProgressBar launcherProgressBar;
+    ImageView imageView;
+
+    //Boolean login;
     private FirebaseAuth mFirebaseAuth;
 
     @Override
@@ -33,52 +40,54 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        loginButton= findViewById(R.id.loginButton);
-        signupButton = findViewById(R.id.signupButton);
-        userName= findViewById(R.id.userName);
-        PasswordText= findViewById(R.id.PasswordText);
-
         mFirebaseAuth = FirebaseAuth.getInstance();
         FirebaseAuth.AuthStateListener myAuthListener;
 
+        //launcherProgressBar = findViewById(R.id.launcherProgressBar);
+        //imageView = findViewById(R.id.imageView);
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = userName.getText().toString();
-                String password = PasswordText.getText().toString();
+        /*SharedPreferences testSp = getApplicationContext().getSharedPreferences("credentials", Context.MODE_PRIVATE);
+        userEmail = testSp.getString("Email","");
+        PasswordText = testSp.getString("password","");
+        loginValue = testSp.getInt("loginValue",loginValue );*/
 
-                if (username.isEmpty()){
-                    Toast.makeText(getApplicationContext(),"Please enter your email", Toast.LENGTH_SHORT).show();
-                }
-                else if (password.isEmpty()){
-                    Toast.makeText(getApplicationContext(),"Please enter your Password", Toast.LENGTH_SHORT).show();
-                }
-                else if(password.length() < 5){
-                    Toast.makeText(getApplicationContext(),"Your password should contain at least 5 characters", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    openNextActivity(username, password);
-                    //execute service, to keep users logged in
-                }
+        //launcherProgressBar.setVisibility(View.VISIBLE);
+        NextActivity();
+       // imageView.setVisibility(View.VISIBLE);
+
+        /*if(loginValue == 0){
+            login = false;
+        }else {
+            login = true;
+        }
+
+        if (login){
+            launcherProgressBar.setVisibility(View.VISIBLE);
+            openNextActivity(userEmail,PasswordText);
+
+        }else{
+            try {
+
+                launcherProgressBar.setVisibility(View.VISIBLE);
+                Thread.sleep(5000);
+                startActivity(new Intent(MainActivity.this, SignInActivity.class));
+                finish();
+
+            }catch (Exception e){
+                e.printStackTrace();
             }
-        });
+        }*/
 
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signingUp();
-            }
-        });
     }
 
-    public void openNextActivity(String username, String password){
+    /*public void openNextActivity(String username, String password){
 
         mFirebaseAuth.signInWithEmailAndPassword(username,password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
                 startActivity(new Intent(MainActivity.this, LandingActivity.class));
+                launcherProgressBar.setVisibility(View.GONE);
                 finish();
                 Toast.makeText(MainActivity.this, "Login successful!",Toast.LENGTH_SHORT).show();
             }
@@ -86,13 +95,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull @NotNull Exception e) {
                 Toast.makeText(MainActivity.this, "Login Failed because of a network issue!",Toast.LENGTH_SHORT).show();
+                launcherProgressBar.setVisibility(View.GONE);
+
             }
         });
 
-    }
+    }*/
 
-    public void signingUp(){
-        Intent intent = new Intent(MainActivity.this,Activity3.class);
-        startActivity(intent);
+    public void NextActivity(){
+        Runnable aQualification = new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    Thread.sleep(5000);
+                    startActivity(new Intent(MainActivity.this, SignInActivity.class));
+                    //launcherProgressBar.setVisibility(View.GONE);
+                    finish();
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread ArenaQBgThread = new Thread(aQualification);
+        ArenaQBgThread.start();
     }
 }

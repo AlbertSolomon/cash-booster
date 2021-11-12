@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.cashbooster">
+
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -13,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CashBooster">
-        <activity android:name=".ThreeToWin"></activity>
+        <activity android:name=".SignInActivity"></activity>
+        <activity android:name=".ThreeToWin" />
         <activity
             android:name=".LandingActivity"
             android:screenOrientation="portrait" /> <!-- android:usesCleartextTraffic="true" -->

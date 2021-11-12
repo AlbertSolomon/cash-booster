@@ -31,12 +31,14 @@ public class ListAdapter extends ArrayAdapter<Records> {
         TextView gameState = convertView.findViewById(R.id.gameState);
         TextView gameAmount = convertView.findViewById(R.id.gameAmount);
         TextView timeMessage = convertView.findViewById(R.id.timeMessage);
+        TextView gameType = convertView.findViewById(R.id.gameType);
 
         //productName.setText(product.productName);
         gameCode.setText(records.GameCode);
         gameAmount.setText(records.Amount);
         gameState.setText(records.GameState);
         timeMessage.setText(records.currentTime);
+        gameType.setText(records.GameType);
 
         //return super.getView(position, convertView, parent);
         return convertView;

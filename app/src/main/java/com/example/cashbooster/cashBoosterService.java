@@ -9,6 +9,8 @@ import android.os.IBinder;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -77,8 +79,12 @@ public class cashBoosterService extends Service {
                             e.printStackTrace();
                         }
 
-                        //Send Json Array to server 000webHost (CashBooster API site)
+                        //Send Json Array to server 000webHost (CashBooster API site) https://cashbooster.000webhostapp.com/
+                        String url = "https://cashbooster.000webhostapp.com/";
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST,url,response -> System.out.println("posting successful "),
+                                error -> System.out.println("failed ")){
 
+                        };
                         
                     }
                 }

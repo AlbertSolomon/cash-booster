@@ -1,11 +1,17 @@
 package com.example.cashbooster;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,7 +24,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,7 +34,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +43,8 @@ import java.util.Random;
 public class Activity2 extends AppCompatActivity {
 
     CardView card2k,card5k,card10k,card20k,card50k,card100k;
+    TextView CashBalanceDisplay;
+    ProgressBar gameProgressBar;
 
     FirebaseAnalytics TestFirebaseAnalytics;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -52,10 +58,11 @@ public class Activity2 extends AppCompatActivity {
     int gameRange;
     int luckyNumber;
     String permission, GameState, GameStart, AccountsCollectionName;
-    boolean gamePlayed, gameAccess,resourcePermission,isFull,fourOfFour;
+    boolean gamePlayed, inAnotherGame;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
     String currentTime = simpleDateFormat.format(new Date());
+
 
     double AccountBalance;
 
@@ -80,7 +87,9 @@ public class Activity2 extends AppCompatActivity {
 
         collectionNameSp = getSharedPreferences("gameCollections", Context.MODE_PRIVATE);
 
-        //CardView Declarations test
+        CashBalanceDisplay = findViewById(R.id.CashBalanceDisplay);
+        gameProgressBar = findViewById(R.id.gameProgressBar);
+
         card2k = findViewById(R.id.card2k);
         card5k = findViewById(R.id.card5k);
         card10k = findViewById(R.id.card10k);
@@ -96,7 +105,7 @@ public class Activity2 extends AppCompatActivity {
         AccountCollection(currentUser,gameRange);
 
         arenaQualification(currentUser);
-        //peepAndCheck();
+        peepAndCheck();
 
         //Restriction after a game has been played, and when some users have exited the Portal
         //playedGameRestriction(currentUser );
@@ -111,7 +120,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -131,7 +140,10 @@ public class Activity2 extends AppCompatActivity {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot document = task.getResult();
                                             if(document.exists()){
+
+                                                gameProgressBar.setVisibility(View.VISIBLE);
                                                 openActivity4(currentUser,collectionName);
+
                                             }else {
                                                 //check if the game has been played
                                                 if(gamePlayed){
@@ -140,24 +152,12 @@ public class Activity2 extends AppCompatActivity {
                                                     if (numberOfPlayers == 0){
                                                         permission = "A";
 
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else if (numberOfPlayers <5){
                                                         permission = "F";
-                                                /*new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                                                            Thread.sleep(500);
-                                                            openActivity4(currentUser);
-
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                });*/
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else {
@@ -188,7 +188,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -208,6 +208,8 @@ public class Activity2 extends AppCompatActivity {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot document = task.getResult();
                                             if(document.exists()){
+
+                                                gameProgressBar.setVisibility(View.VISIBLE);
                                                 openActivity4(currentUser,collectionName);
                                             }else {
                                                 //check if the game has been played
@@ -217,24 +219,12 @@ public class Activity2 extends AppCompatActivity {
                                                     if (numberOfPlayers == 0){
                                                         permission = "A";
 
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else if (numberOfPlayers <5){
                                                         permission = "F";
-                                                /*new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                                                            Thread.sleep(500);
-                                                            openActivity4(currentUser);
-
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                });*/
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else {
@@ -265,7 +255,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -285,6 +275,7 @@ public class Activity2 extends AppCompatActivity {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot document = task.getResult();
                                             if(document.exists()){
+                                                gameProgressBar.setVisibility(View.VISIBLE);
                                                 openActivity4(currentUser,collectionName);
                                             }else {
                                                 //check if the game has been played
@@ -293,25 +284,12 @@ public class Activity2 extends AppCompatActivity {
                                                 }else{
                                                     if (numberOfPlayers == 0){
                                                         permission = "A";
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else if (numberOfPlayers <5){
                                                         permission = "F";
-                                                /*new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                                                            Thread.sleep(500);
-                                                            openActivity4(currentUser);
-
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                });*/
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else {
@@ -342,7 +320,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -362,6 +340,7 @@ public class Activity2 extends AppCompatActivity {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot document = task.getResult();
                                             if(document.exists()){
+                                                gameProgressBar.setVisibility(View.VISIBLE);
                                                 openActivity4(currentUser,collectionName);
                                             }else {
                                                 //check if the game has been played
@@ -370,25 +349,12 @@ public class Activity2 extends AppCompatActivity {
                                                 }else{
                                                     if (numberOfPlayers == 0){
                                                         permission = "A";
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else if (numberOfPlayers <5){
                                                         permission = "F";
-                                                /*new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                                                            Thread.sleep(500);
-                                                            openActivity4(currentUser);
-
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                });*/
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else {
@@ -439,6 +405,7 @@ public class Activity2 extends AppCompatActivity {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot document = task.getResult();
                                             if(document.exists()){
+                                                gameProgressBar.setVisibility(View.VISIBLE);
                                                 openActivity4(currentUser,collectionName);
                                             }else {
                                                 //check if the game has been played
@@ -447,25 +414,12 @@ public class Activity2 extends AppCompatActivity {
                                                 }else{
                                                     if (numberOfPlayers == 0){
                                                         permission = "A";
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else if (numberOfPlayers <5){
                                                         permission = "F";
-                                                /*new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                                                            Thread.sleep(500);
-                                                            openActivity4(currentUser);
-
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                });*/
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else {
@@ -496,7 +450,7 @@ public class Activity2 extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = collectionNameSp.edit();
                 editor.putString("collectionName",collectionName);
-                //editor.putInt("numberOfLosers",requiredLosers);
+                editor.putInt("numberOfLosers",requiredLosers);
                 editor.commit();
 
                 if (AccountBalance < gameRange){
@@ -516,6 +470,7 @@ public class Activity2 extends AppCompatActivity {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot document = task.getResult();
                                             if(document.exists()){
+                                                gameProgressBar.setVisibility(View.VISIBLE);
                                                 openActivity4(currentUser,collectionName);
                                             }else {
                                                 //check if the game has been played
@@ -524,25 +479,12 @@ public class Activity2 extends AppCompatActivity {
                                                 }else{
                                                     if (numberOfPlayers == 0){
                                                         permission = "A";
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else if (numberOfPlayers <5){
                                                         permission = "F";
-                                                /*new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState);
-                                                            Thread.sleep(500);
-                                                            openActivity4(currentUser);
-
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                });*/
-
+                                                        gameProgressBar.setVisibility(View.VISIBLE);
                                                         insertDataDocuments(currentUser,permission,gameRange,luckyNumber,GameStart,GameState,collectionName);
 
                                                     }else {
@@ -565,111 +507,6 @@ public class Activity2 extends AppCompatActivity {
         });
     }
 
-    //################################################## ASYNC TASK (CLASS DECLARATION) #####################################################
-    /*
-    public class JoiningPortals extends AsyncTask<String,String,String>{
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            //join portal
-            //if portal game has been played and if game game portal is full (dont allow new users to join)
-            //else join portal
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-
-                        db.collection(collectionName).whereArrayContains("GameState", "Winner").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()){
-                                    int numberOfWinners = task.getResult().size();
-
-                                    if (numberOfWinners == 0){
-                                        portalPlayed = false;
-                                    }else {
-                                        portalPlayed = true;
-                                    }
-                                }else{
-                                    task.getException();
-                                }
-                            }
-                        });
-                        Thread.sleep(1000);
-                        db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-
-                                    int numberOfDocuments = task.getResult().size();
-
-                                    if (numberOfDocuments == 0){
-                                        resourcePermission = true;
-
-                                    }else if(numberOfDocuments < 5){
-                                        resourcePermission = false;
-
-                                    }else{
-                                        //Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
-                                        //isFull = true;
-                                    }
-                                } else {
-                                    Toast.makeText(getApplicationContext(),"Could not count the number of documents in GamePortals", Toast.LENGTH_SHORT).show();
-                                    task.getException();
-                                }
-
-                            }
-                        });
-                        Thread.sleep(1000);
-                        db.collection(collectionName).document(String.valueOf(strings)).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                gameAccess = true;
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull @NotNull Exception e) {
-                                gameAccess = false;
-                            }
-                        });
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            });
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(String string){
-            super.onPostExecute(string);
-            if (gameAccess && portalPlayed){
-                //go activity4
-                Toast.makeText(getApplicationContext(),"gone to activity 4", Toast.LENGTH_SHORT).show();
-            }else if(resourcePermission){
-                permission = "A";
-                //go activity4
-                Toast.makeText(getApplicationContext(),"gone to activity 4", Toast.LENGTH_SHORT).show();
-            }else if (resourcePermission = false){
-                permission = "F";
-                //go activity4
-                Toast.makeText(getApplicationContext(),"gone to activity 4", Toast.LENGTH_SHORT).show();
-            }else if(isFull){
-                Toast.makeText(getApplicationContext(),"The Challenge is full", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
-
     //############################################ System functionalities... ########################################################
     public void insertDataDocuments(String UserID, String permission, int Amount, int gameCode, String gameStart,String gameState,String collectionName){
 
@@ -689,13 +526,16 @@ public class Activity2 extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
 
+                        gameProgressBar.setVisibility(View.GONE);
                         Toast.makeText(getApplicationContext(),"DocumentSnapshot successfully written", Toast.LENGTH_SHORT).show();
+                        openActivity4(UserID,collectionName);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
 
                         Toast.makeText(getApplicationContext(),"DocumentSnapshot failed", Toast.LENGTH_SHORT).show();
+                        gameProgressBar.setVisibility(View.GONE);
                     }
                 });
             }
@@ -705,6 +545,75 @@ public class Activity2 extends AppCompatActivity {
         insertInDocuments.start();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.cash_booster_menu,menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.Home:
+                Intent intent = new Intent(Activity2.this, LandingActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.topUpAccount:
+                Toast.makeText(getApplicationContext(),"Top up Service is currently not Available", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.cashOut:
+                Toast.makeText(getApplicationContext(),"Cash out Service is currently not Available", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.checkMyRecords:
+
+                Intent intentRecords = new Intent(Activity2.this, Activity5.class);
+                startActivity(intentRecords);
+                break;
+
+            case R.id.acknowledgement:
+
+                //Intent intent = new Intent(Activity2.this, Acknowledgment.class);
+                //startActivity(intent);
+                Toast.makeText(getApplicationContext(),"navigate to Acknowledgment page", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.aboutCashBoosterApp:
+
+                //Intent intent = new Intent(Activity2.this, AboutUs.class);
+                //startActivity(intent);
+                Toast.makeText(getApplicationContext(),"navigate to About Us page", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.logout:
+
+                //calling sign out
+                FirebaseAuth.getInstance().signOut();
+
+                SharedPreferences loginCredentials = getSharedPreferences("credentials", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = loginCredentials.edit();
+                editor.clear();
+                editor.apply();
+
+                Intent firebaseSignOut = new Intent(Activity2.this, MainActivity.class);
+                startActivity(firebaseSignOut);
+                finish();
+
+                //Toast.makeText(getApplicationContext(),"Fire Store Logout", Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    //Operation Methods
     public void searchPortals(){
         db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -731,11 +640,13 @@ public class Activity2 extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"user is Ready !!!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Activity2.this, Activity4.class);
                 startActivity(intent);
+                gameProgressBar.setVisibility(View.GONE);
                 finish();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull @NotNull Exception e) {
+                gameProgressBar.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(),"waiting for user to be Ready !!!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -754,9 +665,11 @@ public class Activity2 extends AppCompatActivity {
                     public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()){
                             if(!task.getResult().exists()){
+
+                                int starterPack = 500000;
                                 Map<String, Object>accountCollection = new HashMap<>();
                                 accountCollection.put("UserID",UserID);
-                                accountCollection.put("AmountBalance", AccountBalance);
+                                accountCollection.put("AmountBalance", starterPack);
 
                                 Accounts.document(UserID).set(accountCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
@@ -799,7 +712,7 @@ public class Activity2 extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     if(document.exists()){
-                                        //CashBalanceDisplay.setText(String.valueOf(document.get("AmountBalance")));
+                                        CashBalanceDisplay.setText(String.valueOf(document.get("AmountBalance")));
                                     }else {
                                        // CashBalanceDisplay.setText("N/A");
                                         handler.postDelayed(this,5000);
@@ -924,6 +837,11 @@ public class Activity2 extends AppCompatActivity {
 
         Thread peepThread = new Thread(innerThread);
         peepThread.start();
+    }
+
+    //Players have to play one game at a time... (sharedPref)
+    public void OnceAtATimeRestriction(){
+
     }
 
     /*public void insertingAndCreatingPortals(String collectionName,String UserID){

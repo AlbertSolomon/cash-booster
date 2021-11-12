@@ -28,14 +28,16 @@
         android:gravity="center"
         android:text=""
         android:textAlignment="center"
-        android:textColor="#E6980202"
+        android:textColor="#FF6347"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/playGame"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/displayCode"
+        app:layout_constraintHorizontal_bias="0.537"
+        app:layout_constraintStart_toStartOf="@+id/displayBalance"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.511" />
+        app:layout_constraintVertical_bias="0.722" />
+    <!--#E6980202-->
 
     <TextView
         android:id="@+id/displayBalance"
@@ -45,17 +47,17 @@
         android:elevation="2dp"
         android:gravity="center"
         android:hint="Account Balance"
+        android:padding="1dp"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="18dp"
         android:textStyle="bold"
-        android:padding="1dp"
         app:layout_constraintBottom_toTopOf="@+id/displayData"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintHorizontal_bias="0.099"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.273" />
+        app:layout_constraintVertical_bias="0.181" />
 
     <TextView
         android:id="@+id/displayCode"
@@ -67,14 +69,33 @@
         android:hint="Code"
         android:textAlignment="center"
         android:textColor="#E28181"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/displayData"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.867"
+        app:layout_constraintHorizontal_bias="0.873"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.263" />
+        app:layout_constraintVertical_bias="0.186" />
+
+    <TextView
+        android:id="@+id/PlayerMessage"
+        android:layout_width="295dp"
+        android:layout_height="47dp"
+        android:text=""
+        android:gravity="center"
+        android:hint="message"
+        android:textAlignment="center"
+        android:textColor="#87C3F6"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/displayData"
+        app:layout_constraintEnd_toEndOf="@+id/displayCode"
+        app:layout_constraintHorizontal_bias="0.596"
+        app:layout_constraintStart_toStartOf="@+id/displayBalance"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.822" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

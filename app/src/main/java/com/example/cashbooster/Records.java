@@ -2,12 +2,12 @@ package com.example.cashbooster;
 
 public class Records {
 
-    String Amount,GameCode,GameState,currentTime;
+    String Amount,GameCode,GameState,currentTime, GameType;
 
-    public Records(String amount, String gameCode, String gameState, String currentTime) {
+    public Records(String amount, String gameCode, String gameState, String GameType) {
         this.Amount = amount;
         this.GameCode = gameCode;
         this.GameState = gameState;
-        this.currentTime = currentTime;
+        this.GameType = GameType;
     }
 }
