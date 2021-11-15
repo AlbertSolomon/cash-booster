@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +46,8 @@ public class Activity5 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = Activity5Binding.inflate(getLayoutInflater());
+        //binding = Activity5Binding.inflate(getLayoutInflater());
+        binding = Activity5Binding.inflate(LayoutInflater.from(getParent()),null,false);
         setContentView(binding.getRoot());
 
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
@@ -54,10 +56,10 @@ public class Activity5 extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
 
-        onlineSQLRecords(currentUser);
+        //onlineSQLRecords(currentUser);
 
 
-       /* String[] amount = {"2000","5000"};
+        String[] amount = {"2000","5000"};
         String[] gameCodes = {"9898","3435"};
         String[] gameStates = {"Winner","Loser"};
         String[] gameType = {"3Winners", "4Winners"};
@@ -71,7 +73,7 @@ public class Activity5 extends AppCompatActivity {
         }
 
         ListAdapter listAdapter = new ListAdapter(Activity5.this,userArrayList);
-        binding.myRecords.setAdapter(listAdapter);*/
+        binding.myRecords.setAdapter(listAdapter);
 
         //displayDataRecordsInfo = findViewById(R.id.displayDataRecordsInfo);
         //rv_Sqlite_Programs = findViewById(R.id.rv_Sqlite_Programs);
@@ -85,12 +87,10 @@ public class Activity5 extends AppCompatActivity {
 
        // displayDataRecordsInfo.setText("This feature is coming soon!!! ");
 
-
-
     }
 
     //Background operation,
-    public void onlineSQLRecords(String userId){
+    /*public void onlineSQLRecords(String userId){
         Runnable sendInBackground = new Runnable() {
             @Override
             public void run() {
@@ -165,6 +165,6 @@ public class Activity5 extends AppCompatActivity {
         };
         Thread sendRequestThread = new Thread(sendInBackground);
         sendRequestThread.start();
-    }
+    }*/
 
 }

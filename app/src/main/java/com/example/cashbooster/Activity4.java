@@ -90,6 +90,7 @@ public class Activity4 extends AppCompatActivity {
 
     String game_state,userId;
     Integer game_amount,gameCode;
+    Date date = new Date();
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -328,13 +329,22 @@ public class Activity4 extends AppCompatActivity {
                             });
                         }
 
+                        try {
+                            String GameType = "Three To win";
+                            Thread.sleep(300);
+                            FirestoreGameRecords(GameType);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+
                         //System.out.println("losers");
                         //System.out.println(numberPot.get(0));
                         //System.out.println(numberPot.get(1));
 
                         try{
 
-                            Thread.sleep(500);
+                            Thread.sleep(700);
                             displayResults(userID);
 
                         }catch (Exception e){
@@ -460,9 +470,18 @@ public class Activity4 extends AppCompatActivity {
                             });
                         }
 
+                        try {
+                            String GameType = "Four To win";
+                            Thread.sleep(300);
+                            FirestoreGameRecords(GameType);
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
                         try{
 
-                            Thread.sleep(500);
+                            Thread.sleep(700);
                             displayResults(userID);
 
                         }catch (Exception e){
@@ -683,7 +702,7 @@ public class Activity4 extends AppCompatActivity {
 
                                                 }else if (numberOfDocuments == 3){
 
-                                                    double AmountWon = UserAmount * 0.3;
+                                                    double AmountWon = UserAmount * 0.5;
                                                     double total = systemBalance + AmountWon;
 
                                                     Map<String, Object> updateTotal = new HashMap<>();
@@ -857,7 +876,7 @@ public class Activity4 extends AppCompatActivity {
         sendRequestThread.start();
     }
 
-//Background Operation
+    //Background Operation
     public void getAccountBalance(String UserID){
         //Realtime updates.
 
@@ -943,6 +962,55 @@ public class Activity4 extends AppCompatActivity {
             }
         });
     } //new
+
+    //background operation
+    public void FirestoreGameRecords(String GameTypeRec){
+        Runnable runnable = new Runnable() {
+            String RecordsBackup = "Records";
+            @Override
+            public void run() {
+                db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                       if(task.isSuccessful()){
+                           for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
+                               String AmountRec = String.valueOf(documentSnapshot.get("Amount"));
+                               String GameCodeRec = String.valueOf(documentSnapshot.get("GameCode"));
+                               String GameStateRec = String.valueOf(documentSnapshot.get("GameState"));
+                               String userID = String.valueOf(documentSnapshot.get("UserID"));
+
+                               //===================================== Keeping Records (Backup Records) ======================================
+                               Map<String, Object> RecordBucket = new HashMap<>();
+                               RecordBucket.put("Amount",AmountRec);
+                               RecordBucket.put("GameCode",GameCodeRec);
+                               RecordBucket.put("GameState",GameStateRec);
+                               RecordBucket.put("UserID",userID);
+                               RecordBucket.put("TimeRecorded",date);
+                               RecordBucket.put("GameType",GameTypeRec);
+
+                               db.collection(collectionName+RecordsBackup).document().set(RecordBucket).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                   @Override
+                                   public void onSuccess(Void unused) {
+                                       Toast.makeText(getApplicationContext(),"Game Back up Successful", Toast.LENGTH_SHORT).show();
+                                   }
+                               }).addOnFailureListener(new OnFailureListener() {
+                                   @Override
+                                   public void onFailure(@NonNull Exception e) {
+                                       Toast.makeText(getApplicationContext(),"Game Back up failed", Toast.LENGTH_SHORT).show();
+                                   }
+                               });
+                           }
+                       }else{
+                           Toast.makeText(getApplicationContext(),task.getException().toString(), Toast.LENGTH_LONG).show();
+                       }
+                    }
+                });
+            }
+        };
+
+        Thread gameRecords = new Thread(runnable);
+        gameRecords.start();
+    }
 
    /* public void SelectWinnersVersion2(String userID){
 

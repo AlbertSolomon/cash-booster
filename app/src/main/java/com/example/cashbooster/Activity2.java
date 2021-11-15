@@ -60,8 +60,7 @@ public class Activity2 extends AppCompatActivity {
     String permission, GameState, GameStart, AccountsCollectionName;
     boolean gamePlayed, inAnotherGame;
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
-    String currentTime = simpleDateFormat.format(new Date());
+    Date date = new Date();
 
 
     double AccountBalance;
@@ -105,7 +104,7 @@ public class Activity2 extends AppCompatActivity {
         AccountCollection(currentUser,gameRange);
 
         arenaQualification(currentUser);
-        peepAndCheck();
+        //peepAndCheck();
 
         //Restriction after a game has been played, and when some users have exited the Portal
         //playedGameRestriction(currentUser );
@@ -520,7 +519,7 @@ public class Activity2 extends AppCompatActivity {
                 gamePortal.put("GameCode",gameCode);
                 gamePortal.put("GameStart",gameStart);
                 gamePortal.put("GameState",gameState);
-                gamePortal.put("CreatedOn", currentTime);
+                gamePortal.put("CreatedOn",date);
 
                 db.collection(collectionName).document(UserID).set(gamePortal).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

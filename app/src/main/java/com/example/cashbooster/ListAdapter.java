@@ -24,7 +24,11 @@ public class ListAdapter extends ArrayAdapter<Records> {
         Records records = getItem(position);
 
         if (convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_records,parent,false);
+            LayoutInflater inflater = (LayoutInflater) LayoutInflater.from(getContext());
+            convertView = inflater.inflate(R.layout.list_records, parent, false);
+
+            //convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_records,null);
+           // convertView  = inflator.inflate(R.layout.list_records, parent, false);
         }
 
         TextView gameCode = convertView.findViewById(R.id.gameCode);

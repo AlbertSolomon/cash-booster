@@ -57,8 +57,7 @@ public class ThreeToWin extends AppCompatActivity {
     String permission, GameState, GameStart, AccountsCollectionName;
     boolean gamePlayed, gameAccess,resourcePermission,isFull,fourOfFour;
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-    String currentTime = simpleDateFormat.format(new Date());
+    Date date = new Date();
 
     double AccountBalance;
 
@@ -105,7 +104,7 @@ public class ThreeToWin extends AppCompatActivity {
         AccountCollection(currentUser,gameRange);
 
         arenaQualification(currentUser);
-        peepAndCheck();
+        //peepAndCheck();
 
         //Restriction after a game has been played, and when some users have exited the Portal
         //playedGameRestriction(currentUser );
@@ -582,7 +581,7 @@ public class ThreeToWin extends AppCompatActivity {
                 gamePortal.put("GameCode",gameCode);
                 gamePortal.put("GameStart",gameStart);
                 gamePortal.put("GameState",gameState);
-                gamePortal.put("CreatedOn", currentTime);
+                gamePortal.put("CreatedOn", date);
 
                 db.collection(collectionName).document(UserID).set(gamePortal).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -792,7 +791,7 @@ public class ThreeToWin extends AppCompatActivity {
         Runnable innerThread = new Runnable() {
             @Override
             public void run() {
-                GamePortals.whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                db.collection(collectionName).whereEqualTo("GameStart","Ready").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
