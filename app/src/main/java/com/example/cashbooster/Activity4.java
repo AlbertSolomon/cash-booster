@@ -206,8 +206,9 @@ public class Activity4 extends AppCompatActivity {
 
             case R.id.checkMyRecords:
 
-                Intent intentRecords = new Intent(Activity4.this, Activity5.class);
-                startActivity(intentRecords);
+                /*Intent intentRecords = new Intent(Activity4.this, DataDisplayActivity.class);
+                startActivity(intentRecords);*/
+                Toast.makeText(getApplicationContext(),"This Service is currently not Available", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.acknowledgement:
@@ -353,62 +354,6 @@ public class Activity4 extends AppCompatActivity {
 
                     }else {
 
-                        //################################### 5 to play 3 to win ######################################################
-                        /*for(int i= 0; i< numberPot.size() - 1; i++){
-                            int randomIndex = random.nextInt(numberPot.size());
-                            boolean toGameWinners,gameLoser;
-
-                            toGameWinners=gameWinners.add(numberPot.get(randomIndex));
-                            gameLoser= numberPot.remove(numberPot.get(randomIndex));
-
-                            if(toGameWinners == gameLoser){
-                                gameWinners.add(numberPot.get(randomIndex));
-                                numberPot.remove(numberPot.get(randomIndex));
-                            }
-                        }
-                        for(int counter = 1; counter < 5; counter++){
-                            db.collection(collectionName).whereEqualTo("GameCode", gameWinners.get(counter -1)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                                    if(task.isSuccessful()){
-                                        for(QueryDocumentSnapshot document: task.getResult()){
-                                            if (gameWinners.size() <= 4){
-
-                                                Map<String, Object> updateWinner = new HashMap<>();
-                                                updateWinner.put("GameState","Winner");
-                                                GamePortals.document(document.getId()).update(updateWinner);
-                                                Toast.makeText(getApplicationContext(),"Winners updated", Toast.LENGTH_SHORT).show();
-                                                //System.out.println(gameWinners);
-
-                                            }
-                                        }
-
-                                    }else {
-                                        Toast.makeText(getApplicationContext(),"Some is wrong with Query", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                        }
-
-                        db.collection(collectionName).whereEqualTo("GameCode",numberPot.get(0)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                                if(task.isSuccessful()){
-                                    for (QueryDocumentSnapshot document: task.getResult()){
-                                        Map<String, Object> updateLoser = new HashMap<>();
-                                        updateLoser.put("GameState",Loser);
-                                        GamePortals.document(document.getId()).update(updateLoser);
-                                        Toast.makeText(getApplicationContext(),"Loser updated", Toast.LENGTH_SHORT).show();
-                                    }
-                                }else{
-                                    task.getException();
-                                }
-                            }
-                        });*/
-
-                        //displayData.setText(valueOf(gameWinners.get(1)));
-                        //displayData.setText(valueOf(numberPot.size()));
-                        //displayData.setText(valueOf(gameWinners.size()));
                         //######################################################## new implementation 4 to win
 
                         int numberOfElements = 4;
@@ -554,7 +499,7 @@ public class Activity4 extends AppCompatActivity {
                                     //Toast.makeText(getApplicationContext()," AccountBalance:"+balance, Toast.LENGTH_SHORT).show();
 
                                     if(threeToWinIs){
-                                        double AmountWon = UserAmount * 0.3;
+                                        double AmountWon = UserAmount * 0.5;
                                         double total = balance + AmountWon;
 
                                         Map<String, Object> updateTotal = new HashMap<>();

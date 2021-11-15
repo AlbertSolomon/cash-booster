@@ -528,9 +528,12 @@ public class ThreeToWin extends AppCompatActivity {
 
             case R.id.checkMyRecords:
 
-                Intent intentRecords = new Intent(ThreeToWin.this, Activity5.class);
+                /*Intent intentRecords = new Intent(ThreeToWin.this, Activity5.class);
                 startActivity(intentRecords);
-                break;
+                break;*/
+
+                 Toast.makeText(getApplicationContext(),"This Service is currently not Available", Toast.LENGTH_SHORT).show();
+                 break;
 
             case R.id.acknowledgement:
 

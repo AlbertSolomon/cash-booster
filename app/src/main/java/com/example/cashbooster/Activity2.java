@@ -571,8 +571,11 @@ public class Activity2 extends AppCompatActivity {
 
             case R.id.checkMyRecords:
 
-                Intent intentRecords = new Intent(Activity2.this, Activity5.class);
+                /*Intent intentRecords = new Intent(Activity2.this, Activity5.class);
                 startActivity(intentRecords);
+                break;*/
+
+                Toast.makeText(getApplicationContext(),"This Service is currently not Available", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.acknowledgement:
@@ -715,7 +718,7 @@ public class Activity2 extends AppCompatActivity {
                                     }else {
                                        // CashBalanceDisplay.setText("N/A");
                                         handler.postDelayed(this,5000);
-                                        Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getApplicationContext(),"User Account Document does not exist!", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             };

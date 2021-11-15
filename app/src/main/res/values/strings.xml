@@ -22,5 +22,11 @@
     <string name="logout">Logout</string>
     <string name="more">More</string>
     <string name="password">Password</string>
+    <string name="gameState">GameState</string>
+    <string name="game_code">GameCode</string>
+    <string name="amount">Amount</string>
+    <string name="game_type">GameType</string>
+    <string name="time_played">Time Played</string>
+    <string name="id">ID</string>
 
 </resources>
