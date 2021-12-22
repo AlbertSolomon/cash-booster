@@ -206,8 +206,9 @@ public class Activity4 extends AppCompatActivity {
 
             case R.id.checkMyRecords:
 
-                Intent intentRecords = new Intent(Activity4.this, Activity5.class);
-                startActivity(intentRecords);
+                /*Intent intentRecords = new Intent(Activity4.this, DataDisplayActivity.class);
+                startActivity(intentRecords);*/
+                Toast.makeText(getApplicationContext(),"This Service is currently not Available", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.acknowledgement:
@@ -353,7 +354,11 @@ public class Activity4 extends AppCompatActivity {
 
                     }else {
 
+<<<<<<< HEAD
                         //########################################### new implementation 4 to  #############################################
+=======
+                        //######################################################## new implementation 4 to win
+>>>>>>> origin/master
 
                         int numberOfElements = 4;
 
@@ -498,7 +503,7 @@ public class Activity4 extends AppCompatActivity {
                                     //Toast.makeText(getApplicationContext()," AccountBalance:"+balance, Toast.LENGTH_SHORT).show();
 
                                     if(threeToWinIs){
-                                        double AmountWon = UserAmount * 0.3;
+                                        double AmountWon = UserAmount * 0.5;
                                         double total = balance + AmountWon;
 
                                         Map<String, Object> updateTotal = new HashMap<>();

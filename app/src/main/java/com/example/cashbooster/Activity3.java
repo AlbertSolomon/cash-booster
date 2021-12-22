@@ -116,7 +116,7 @@ public class Activity3 extends AppCompatActivity {
                         db.collection(AuthBucket).document().set(authBucket).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                Toast.makeText(Activity3.this,"setting thing up", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Activity3.this,"setting things up", Toast.LENGTH_SHORT).show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -126,7 +126,7 @@ public class Activity3 extends AppCompatActivity {
                         });
 
                         Toast.makeText(Activity3.this,"Login successful!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(Activity3.this, Activity2.class));
+                        startActivity(new Intent(Activity3.this, LandingActivity.class));
 
                         /*SharedPreferences.Editor editor = loginCredentials.edit();
                         editor.putString("Email",username);

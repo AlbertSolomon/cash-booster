@@ -46,8 +46,8 @@ public class Activity5 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //binding = Activity5Binding.inflate(getLayoutInflater());
-        binding = Activity5Binding.inflate(LayoutInflater.from(getParent()),null,false);
+         binding = Activity5Binding.inflate(getLayoutInflater());
+        //binding = Activity5Binding.inflate(LayoutInflater.from(getParent()),null,false);
         setContentView(binding.getRoot());
 
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
