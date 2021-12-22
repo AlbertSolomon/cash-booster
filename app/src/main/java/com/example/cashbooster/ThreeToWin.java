@@ -554,7 +554,7 @@ public class ThreeToWin extends AppCompatActivity {
                 editor.clear();
                 editor.apply();
 
-                Intent firebaseSignOut = new Intent(ThreeToWin.this, MainActivity.class);
+                Intent firebaseSignOut = new Intent(ThreeToWin.this, SignInActivity.class);
                 startActivity(firebaseSignOut);
                 finish();
 

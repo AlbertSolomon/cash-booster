@@ -3,9 +3,26 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_2.xml" value="0.2552083333333333" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/drawable/round_btn.xml" value="0.290625" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/drawable/round_notification_bubble.xml" value="0.290625" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/drawable/rounded_corner_solid_btn.xml" value="0.290625" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/drawable/rounded_edit_text.xml" value="0.290625" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/drawable/text_view_shadow.xml" value="0.290625" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/drawable/text_view_shadow_app_color.xml" value="0.290625" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_2.xml" value="0.1824792243767313" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_4.xml" value="0.2" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_landing.xml" value="0.264" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_main.xml" value="0.2" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_sign_in.xml" value="0.176" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_spin_wheel_test.xml" value="0.176" />
         <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_sqlite_display.xml" value="0.21041666666666667" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/activity_three_to_win.xml" value="0.23731884057971014" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/content_second.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/fragment_first.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/fragment_second.xml" value="0.27447916666666666" />
         <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/list_records.xml" value="0.24427083333333333" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/layout/single_item.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/whitehats ict world/StudioProjects/cash-booster/app/src/main/res/menu/cash_booster_menu.xml" value="0.1716612377850163" />
       </map>
     </option>
   </component>

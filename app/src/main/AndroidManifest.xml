@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CashBooster">
         <activity
+            android:name=".SpinWheelTest"
+            android:exported="false" />
+        <activity
             android:name=".sqliteDisplayActivity"
             android:exported="false" />
         <activity android:name=".SignInActivity" />

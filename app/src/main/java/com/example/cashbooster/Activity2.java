@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,7 @@ import java.util.Random;
 
 public class Activity2 extends AppCompatActivity {
 
+    ImageView rock2,rock100;
     CardView card2k,card5k,card10k,card20k,card50k,card100k;
     TextView CashBalanceDisplay;
     ProgressBar gameProgressBar;
@@ -62,9 +64,7 @@ public class Activity2 extends AppCompatActivity {
 
     Date date = new Date();
 
-
     double AccountBalance;
-
     {
         AccountsCollectionName = "Accounts";
         portalNameHolder = "";
@@ -89,6 +89,9 @@ public class Activity2 extends AppCompatActivity {
         CashBalanceDisplay = findViewById(R.id.CashBalanceDisplay);
         gameProgressBar = findViewById(R.id.gameProgressBar);
 
+        rock2 = findViewById(R.id.rock2);
+        rock100 = findViewById(R.id.rock100);
+
         card2k = findViewById(R.id.card2k);
         card5k = findViewById(R.id.card5k);
         card10k = findViewById(R.id.card10k);
@@ -101,9 +104,10 @@ public class Activity2 extends AppCompatActivity {
         String currentUser = mFirebaseAuth.getCurrentUser().getUid();
 
         getAccountBalance(currentUser);
+        LockThatThing();
         AccountCollection(currentUser,gameRange);
-
         arenaQualification(currentUser);
+        //OnceAtATimeRestriction(currentUser);
         //peepAndCheck();
 
         //Restriction after a game has been played, and when some users have exited the Portal
@@ -178,7 +182,7 @@ public class Activity2 extends AppCompatActivity {
             }
         });
 
-        //################################# 5k ############################################
+        //################################ 5k ############################################
         card5k.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -245,7 +249,7 @@ public class Activity2 extends AppCompatActivity {
             }
         });
 
-        //################################### 10k ##########################################
+        //################################# 10k ##########################################
         card10k.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -310,7 +314,7 @@ public class Activity2 extends AppCompatActivity {
             }
         });
 
-        //############################### 20k ##############################################
+        //################################## 20k ##############################################
         card20k.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -375,7 +379,7 @@ public class Activity2 extends AppCompatActivity {
             }
         });
 
-        //############################ 50k #################################################
+        //################################ 50k ##########################################
         card50k.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -509,6 +513,8 @@ public class Activity2 extends AppCompatActivity {
     //############################################ System functionalities... ########################################################
     public void insertDataDocuments(String UserID, String permission, int Amount, int gameCode, String gameStart,String gameState,String collectionName){
 
+        //remove joining restrictions, by checking the number of documents which have played or not
+
         Runnable insertDataDocuments = new Runnable() {
             @Override
             public void run() {
@@ -570,9 +576,10 @@ public class Activity2 extends AppCompatActivity {
                 break;
 
             case R.id.checkMyRecords:
-
-                Intent intentRecords = new Intent(Activity2.this, Activity5.class);
-                startActivity(intentRecords);
+                Intent intentSpinner = new Intent(Activity2.this, SpinWheelTest.class);
+                startActivity(intentSpinner);
+                //Intent intentRecords = new Intent(Activity2.this, Activity5.class);
+                //startActivity(intentRecords);
                 break;
 
             case R.id.acknowledgement:
@@ -599,7 +606,7 @@ public class Activity2 extends AppCompatActivity {
                 editor.clear();
                 editor.apply();
 
-                Intent firebaseSignOut = new Intent(Activity2.this, MainActivity.class);
+                Intent firebaseSignOut = new Intent(Activity2.this, SignInActivity.class);
                 startActivity(firebaseSignOut);
                 finish();
 
@@ -614,7 +621,7 @@ public class Activity2 extends AppCompatActivity {
 
     //Operation Methods
     public void searchPortals(){
-        db.collection("GamePortals").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(collectionName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 //Check if user balance is qualified for a particular game portal.
@@ -763,6 +770,25 @@ public class Activity2 extends AppCompatActivity {
         ArenaQBgThread.start();
     }
 
+    //Background operations,
+    public void LockThatThing(){
+        Runnable padlockRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (AccountBalance < 2000){
+                    rock2.setVisibility(View.VISIBLE);
+                }
+                if (AccountBalance < 100000){
+                    rock100.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+
+        Thread lockThatUpThread = new Thread(padlockRunnable);
+        lockThatUpThread.start();
+
+    }
+
     //background operation
     public void playedGameRestriction(String nameOfCollection){
 
@@ -793,8 +819,6 @@ public class Activity2 extends AppCompatActivity {
         gameRestrictionBgThread.start();
 
     }
-
-    //
 
     //background operation
     public void peepAndCheck(){
@@ -839,8 +863,45 @@ public class Activity2 extends AppCompatActivity {
     }
 
     //Players have to play one game at a time... (sharedPref)
-    public void OnceAtATimeRestriction(){
+    public void OnceAtATimeRestriction(String userID){
+        ArrayList<String> gamePortals = new ArrayList<>();
+        gamePortals.add("GamePortals");
+        gamePortals.add("GamePortal5k");
+        gamePortals.add("GamePortal10k");
+        gamePortals.add("GamePortal20k");
+        gamePortals.add("GamePortal50k");
+        gamePortals.add("GamePortal100k");
 
+        // Handler handler;
+        // handler = new Handler();
+
+        Runnable verifyEveryPortal = new Runnable() {
+            @Override
+            public void run() {
+                while (!inAnotherGame){
+                    for (String portal: gamePortals){
+                        db.collection(portal).document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()){
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()){
+                                        inAnotherGame = true;
+                                    }else{
+                                        inAnotherGame = false;
+                                    }
+                                }else {
+                                    Toast.makeText(getApplicationContext(),task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        };
+
+        Thread verifyInPortalsThread = new Thread(verifyEveryPortal);
+        verifyInPortalsThread.start();
     }
 
     /*public void insertingAndCreatingPortals(String collectionName,String UserID){
@@ -886,7 +947,5 @@ public class Activity2 extends AppCompatActivity {
         Thread runningIAndCThread = new Thread(RunningInsertAndCreate);
         runningIAndCThread.start();
     }*/
-
     //background operations, checking if portals
-
 }

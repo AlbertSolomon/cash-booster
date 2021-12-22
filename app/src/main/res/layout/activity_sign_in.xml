@@ -13,10 +13,10 @@
         android:background="@drawable/ic_nw_top_wave"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.752"
+        app:layout_constraintHorizontal_bias="0.77"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <View
         android:id="@+id/view"
@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="195dp"
+        android:layout_width="0dp"
         android:layout_height="68dp"
         android:layout_marginBottom="184dp"
         android:gravity="center"
